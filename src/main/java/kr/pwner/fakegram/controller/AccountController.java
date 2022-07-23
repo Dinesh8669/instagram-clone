@@ -69,11 +69,8 @@ public class AccountController {
             @RequestHeader(name = "Authorization")
             final String authorization
     ) {
-        // Don't use this func on here
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        return accountService.DeleteAccount(
                 authorization.replace("Bearer ", "")
         );
-        return accountService.DeleteAccount(accessToken);
     }
 }

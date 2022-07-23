@@ -105,8 +105,9 @@ public class AccountService {
 
     @Transactional(rollbackFor = {Exception.class})
     public ResponseEntity<SuccessResponse<NullType>> DeleteAccount(
-            DecodedJWT accessToken
+            String authorization
     ) {
+        DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
                 .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
