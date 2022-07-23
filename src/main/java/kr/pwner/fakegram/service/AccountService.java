@@ -55,8 +55,8 @@ public class AccountService {
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
             final SignUpDto signUpDto
     ) {
-        if (!Objects.isNull(accountRepository.findById(signUpDto.getId())))
-            throw new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS);
+        Optional.ofNullable(accountRepository.findById(signUpDto.getId()))
+                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS));
 
         Account account = new Account();
         account.setUuid(UUID.randomUUID().toString())
