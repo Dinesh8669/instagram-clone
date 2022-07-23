@@ -1,4 +1,4 @@
-package kr.pwner.fakegram;
+package kr.pwner.fakegram.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pwner.fakegram.controller.AccountController;

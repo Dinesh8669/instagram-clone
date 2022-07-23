@@ -1,8 +1,9 @@
-package kr.pwner.fakegram;
+package kr.pwner.fakegram.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.pwner.fakegram.Application;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.TokenDto;
 import kr.pwner.fakegram.dto.account.SignUpDto;
