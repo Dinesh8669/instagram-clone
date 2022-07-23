@@ -58,12 +58,10 @@ public class AccountController {
             @Valid
             final UpdateDto updateDto
     ) {
-        // Don't use this func on here
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
-                authorization.replace("Bearer ", "")
+        return accountService.UpdateAccount(
+                authorization.replace("Bearer ", ""),
+                updateDto
         );
-        return accountService.UpdateAccount(accessToken, updateDto);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = "application/json")

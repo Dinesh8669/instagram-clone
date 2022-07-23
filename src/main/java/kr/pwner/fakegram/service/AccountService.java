@@ -25,13 +25,15 @@ import java.util.UUID;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    private final JwtService jwtService;
     public AccountService(
             AccountRepository accountRepository,
-            BCryptPasswordEncoder bCryptPasswordEncoder
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            JwtService jwtService
     ) {
         this.accountRepository = accountRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtService = jwtService;
     }
 
     public ResponseEntity<SuccessResponse<AccountInformationDto>> GetAccountInformation(
@@ -74,16 +76,16 @@ public class AccountService {
 
     @Transactional(rollbackFor = {Exception.class})
     public ResponseEntity<SuccessResponse<NullType>> UpdateAccount(
-            DecodedJWT accessToken,
+            String authorization,
             UpdateDto updateDto
     ) {
+        DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
         if (
                 Objects.isNull(updateDto.getId()) &&
                 Objects.isNull(updateDto.getPassword()) &&
                 Objects.isNull(updateDto.getEmail()) &&
                 Objects.isNull(updateDto.getName())
         ) throw new ApiException(ExceptionEnum.NOTHING_INFORMATION_TO_UPDATE);
-
 
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
