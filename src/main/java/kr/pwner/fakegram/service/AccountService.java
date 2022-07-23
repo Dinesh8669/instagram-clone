@@ -26,6 +26,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
+
     public AccountService(
             AccountRepository accountRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
@@ -40,7 +41,7 @@ public class AccountService {
             String id
     ) {
         Account account = Optional.ofNullable(accountRepository.findById(id))
-                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
         AccountInformationDto accountInformationDto = new AccountInformationDto();
         accountInformationDto
@@ -80,8 +81,7 @@ public class AccountService {
             UpdateDto updateDto
     ) {
         DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
-        if (
-                Objects.isNull(updateDto.getId()) &&
+        if (Objects.isNull(updateDto.getId()) &&
                 Objects.isNull(updateDto.getPassword()) &&
                 Objects.isNull(updateDto.getEmail()) &&
                 Objects.isNull(updateDto.getName())
@@ -89,7 +89,7 @@ public class AccountService {
 
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
-                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
         // Insert only if not null
         String updateId = Objects.nonNull(updateDto.getId()) ? updateDto.getId() : account.getId();
@@ -110,7 +110,7 @@ public class AccountService {
         DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
-                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.setIsActivated(false).setPassword("");
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
