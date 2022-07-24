@@ -65,8 +65,10 @@ public class AuthControllerTest {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         // https://stackoverflow.com/questions/11664894/jackson-deserialize-using-generic-class
-        SuccessResponse<SignInResponseDto> successResponse = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        SuccessResponse<SignInResponseDto> successResponse = objectMapper.readValue(
+                response,
+                new TypeReference<>() {}
+        );
         String accessToken = successResponse.getData().getAccessToken();
         DecodedJWT decodedJWT = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), accessToken);
 
