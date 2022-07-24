@@ -1,18 +1,18 @@
 package kr.pwner.fakegram.controller;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.TokenDto;
 import kr.pwner.fakegram.dto.auth.SignInDto;
 import kr.pwner.fakegram.dto.auth.SignInResponseDto;
 import kr.pwner.fakegram.service.AuthService;
-import kr.pwner.fakegram.service.JwtService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.type.NullType;
 import javax.validation.Valid;
 
+@Validated
 @RestController
 @RequestMapping(path = "/api/v1/auth")
 public class AuthController {

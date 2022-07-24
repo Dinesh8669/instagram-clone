@@ -1,12 +1,10 @@
 package kr.pwner.fakegram.controller;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.AccountInformationDto;
 import kr.pwner.fakegram.dto.account.SignUpDto;
 import kr.pwner.fakegram.dto.account.UpdateDto;
 import kr.pwner.fakegram.service.AccountService;
-import kr.pwner.fakegram.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
