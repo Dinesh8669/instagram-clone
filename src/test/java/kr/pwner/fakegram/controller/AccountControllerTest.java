@@ -1,7 +1,6 @@
 package kr.pwner.fakegram.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.pwner.fakegram.controller.AccountController;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.AccountInformationDto;
 import kr.pwner.fakegram.dto.account.SignUpDto;
@@ -65,7 +64,7 @@ public class AccountControllerTest {
 
     @Transactional
     @Test
-    public void GetAccountInformation() throws Exception {
+    public void ReadAccount() throws Exception {
         CreateTemporaryAccount();
         AccountInformationDto accountInformationDto = new AccountInformationDto();
         accountInformationDto

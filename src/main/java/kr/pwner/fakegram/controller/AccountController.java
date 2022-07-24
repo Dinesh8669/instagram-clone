@@ -27,13 +27,13 @@ public class AccountController {
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<SuccessResponse<AccountInformationDto>> GetAccountInformation(
+    public ResponseEntity<SuccessResponse<AccountInformationDto>> ReadAccount(
             @PathVariable
             @NotBlank
             @Pattern(regexp="^[a-zA-Z0-9]+", message="^[a-zA-Z0-9]+")
             final String id
     ) {
-        return accountService.GetAccountInformation(id);
+        return accountService.ReadAccount(id);
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")

@@ -37,7 +37,7 @@ public class AccountService {
         this.jwtService = jwtService;
     }
 
-    public ResponseEntity<SuccessResponse<AccountInformationDto>> GetAccountInformation(
+    public ResponseEntity<SuccessResponse<AccountInformationDto>> ReadAccount(
             String id
     ) {
         Account account = Optional.ofNullable(accountRepository.findById(id))
