@@ -26,6 +26,15 @@ public class AccountController {
         this.accountService = accountService;
     }
 
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
+            @Valid
+            @RequestBody
+            final SignUpDto signUpDto
+    ) {
+        return accountService.CreateAccount(signUpDto);
+    }
+
     @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<SuccessResponse<AccountInformationDto>> ReadAccount(
             @PathVariable
@@ -36,14 +45,6 @@ public class AccountController {
         return accountService.ReadAccount(id);
     }
 
-    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
-            @Valid
-            @RequestBody
-            final SignUpDto signUpDto
-    ) {
-        return accountService.CreateAccount(signUpDto);
-    }
 
     @RequestMapping(method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<SuccessResponse<NullType>> UpdateAccount(
