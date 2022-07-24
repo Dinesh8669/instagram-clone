@@ -17,14 +17,11 @@ import javax.validation.Valid;
 @RequestMapping(path = "/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
-    private final JwtService jwtService;
 
     public AuthController(
-            final AuthService authService,
-            final JwtService jwtService
+            final AuthService authService
     ) {
         this.authService = authService;
-        this.jwtService = jwtService;
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")

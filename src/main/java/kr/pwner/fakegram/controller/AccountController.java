@@ -21,14 +21,11 @@ import javax.validation.constraints.Pattern;
 @RequestMapping(path = "/api/v1/account")
 public class AccountController {
     private final AccountService accountService;
-    private final JwtService jwtService;
 
     public AccountController(
-            final AccountService accountService,
-            final JwtService jwtService
+            final AccountService accountService
     ) {
         this.accountService = accountService;
-        this.jwtService = jwtService;
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = "application/json")
