@@ -50,11 +50,8 @@ public class AuthController {
             @RequestHeader(name = "Authorization")
             String authorization
     ) {
-        // Don't use this func on here
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        return authService.SignOut(
                 authorization.replace("Bearer ", "")
         );
-        return authService.SignOut(accessToken);
     }
 }

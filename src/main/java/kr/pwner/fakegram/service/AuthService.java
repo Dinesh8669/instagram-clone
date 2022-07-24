@@ -38,7 +38,7 @@ public class AuthService {
 
     private Account ValidateAccount(final String id, final String password) {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivatedTrue(id))
-                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         if (!bCryptPasswordEncoder.matches(password, account.getPassword()))
             throw new ApiException(ExceptionEnum.INCORRECT_ACCOUNT_PASSWORD);
         return account;
@@ -65,7 +65,7 @@ public class AuthService {
         }
         String uuid = refreshToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuid(uuid))
-                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
         String dbRefreshTokenUuid = account.getRefreshTokenUuid();
         String RequestRefreshTokenUuid = refreshToken.getClaim("refreshTokenUuid").asString();
@@ -78,13 +78,16 @@ public class AuthService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<NullType>> SignOut(DecodedJWT accessToken) {
+    public ResponseEntity<SuccessResponse<NullType>> SignOut(String authorization) {
+        DecodedJWT accessToken = jwtService.VerifyJwt(
+                jwtService.getAccessTokenSecret(),
+                authorization
+        );
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = accountRepository.findByUuid(uuid);
         Optional.ofNullable(account.getRefreshTokenUuid())
-                .orElseThrow(()->new ApiException(ExceptionEnum.ALREADY_SIGN_OUT));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ALREADY_SIGN_OUT));
         account.setRefreshTokenUuid(null);
-        accountRepository.save(account);
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

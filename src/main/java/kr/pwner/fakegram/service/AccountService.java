@@ -56,7 +56,7 @@ public class AccountService {
             final SignUpDto signUpDto
     ) {
         Optional.ofNullable(accountRepository.findById(signUpDto.getId()))
-                .orElseThrow(()->new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS));
 
         Account account = new Account();
         account.setUuid(UUID.randomUUID().toString())
