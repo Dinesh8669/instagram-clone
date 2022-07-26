@@ -29,7 +29,7 @@ public class AccountController {
         return accountService.CreateAccount(request);
     }
 
-    @RequestMapping(path = "/{id:^[a-zA-Z0-9]+}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/{id:^[a-zA-Z0-9]+}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<SuccessResponse<ReadAccountDto.Response>> ReadAccount(
             @Valid @PathVariable final String id
     ) {
