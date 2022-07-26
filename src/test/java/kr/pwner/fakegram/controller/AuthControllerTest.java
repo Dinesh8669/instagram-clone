@@ -5,10 +5,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pwner.fakegram.Application;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
-import kr.pwner.fakegram.dto.TokenDto;
-import kr.pwner.fakegram.dto.account.SignUpDto;
+import kr.pwner.fakegram.dto.account.CreateAccountDto;
+import kr.pwner.fakegram.dto.auth.RefreshDto;
 import kr.pwner.fakegram.dto.auth.SignInDto;
-import kr.pwner.fakegram.dto.auth.SignInResponseDto;
 import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.service.AccountService;
@@ -43,60 +42,71 @@ public class AuthControllerTest {
     @Autowired
     private AccountRepository accountRepository;
 
-    public void CreateTemporaryAccount() {
-        SignUpDto signUpDto = new SignUpDto()
-                .setId("andrew")
-                .setPassword("password123")
-                .setEmail("test@asd.com")
-                .setName("tester");
-        accountService.CreateAccount(signUpDto);
+    private final String TESTER_ID = "TeSteR";
+    private final String TESTER_PW = "password123";
+    private final String TESTER_EMAIL = "testtest@test.com";
+    private final String TESTER_NAME = "tester!";
+
+
+    private void CreateTemporaryAccount() {
+        CreateAccountDto.Request request = new CreateAccountDto.Request()
+                .setId(TESTER_ID)
+                .setPassword(TESTER_PW)
+                .setEmail(TESTER_EMAIL)
+                .setName(TESTER_NAME);
+        accountService.CreateAccount(request);
     }
 
     @Transactional
     @Test
     public void SignIn() throws Exception {
         CreateTemporaryAccount();
-        SignInDto signInDto = new SignInDto();
-        signInDto.setId("andrew").setPassword("password123");
+        SignInDto.Request request = new SignInDto.Request()
+                .setId(TESTER_ID)
+                .setPassword(TESTER_PW);
 
         String response = mvc.perform(post("/api/v1/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signInDto)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         // https://stackoverflow.com/questions/11664894/jackson-deserialize-using-generic-class
-        SuccessResponse<SignInResponseDto> successResponse = objectMapper.readValue(
+        SuccessResponse<SignInDto.Response> successResponse = objectMapper.readValue(
                 response,
                 new TypeReference<>() {}
         );
+
         String accessToken = successResponse.getData().getAccessToken();
         DecodedJWT decodedJWT = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), accessToken);
-
-        decodedJWT.getClaim("uuid");
         assertEquals(
                 decodedJWT.getClaim("uuid").asString(),
-                accountRepository.findById("andrew").getUuid());
+                accountRepository.findById(TESTER_ID).getUuid()
+        );
     }
 
     @Transactional
     @Test
     public void Refresh() throws Exception {
         CreateTemporaryAccount();
-        String refreshToken = jwtService.GenerateRefreshToken("andrew");
-
-        TokenDto tokenDto = new TokenDto();
-        tokenDto.setRefreshToken(refreshToken);
+        String refreshToken = jwtService.GenerateRefreshToken(TESTER_ID);
+        RefreshDto.Request request = new RefreshDto.Request().setRefreshToken(refreshToken);
 
         String response = mvc.perform(put("/api/v1/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(tokenDto)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        SuccessResponse<String> successResponse = objectMapper.readValue(response, new TypeReference<>() {
-        });
-        DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), successResponse.getData());
+
+        SuccessResponse<RefreshDto.Response> successResponse = objectMapper.readValue(
+                response,
+                new TypeReference<>() {}
+        );
+        DecodedJWT accessToken = jwtService.VerifyJwt(
+                jwtService.getAccessTokenSecret(),
+                successResponse.getData().getAccessToken()
+        );
 
         String uuid = accessToken.getClaim("uuid").asString();
-        Account account = accountRepository.findByUuid(accessToken.getClaim("uuid").asString());
+        Account account = accountRepository.findByUuid(uuid);
 
         assertEquals(uuid, account.getUuid());
     }
@@ -105,8 +115,8 @@ public class AuthControllerTest {
     @Test
     public void SignOut() throws Exception {
         CreateTemporaryAccount();
-        String accessToken = jwtService.GenerateAccessToken("andrew"); //for sign out
-        jwtService.GenerateRefreshToken("andrew"); // for generate refresh token uuid
+        String accessToken = jwtService.GenerateAccessToken(TESTER_ID); //for sign out
+        jwtService.GenerateRefreshToken(TESTER_ID); // for generate refresh token uuid
         mvc.perform(delete("/api/v1/auth")
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
                         .contentType(MediaType.APPLICATION_JSON))

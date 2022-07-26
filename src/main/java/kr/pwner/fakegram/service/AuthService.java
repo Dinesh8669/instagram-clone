@@ -3,9 +3,8 @@ package kr.pwner.fakegram.service;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
-import kr.pwner.fakegram.dto.TokenDto;
+import kr.pwner.fakegram.dto.auth.RefreshDto;
 import kr.pwner.fakegram.dto.auth.SignInDto;
-import kr.pwner.fakegram.dto.auth.SignInResponseDto;
 import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
@@ -44,22 +43,29 @@ public class AuthService {
         return account;
     }
 
-    public ResponseEntity<SuccessResponse<SignInResponseDto>> SignIn(final SignInDto accountDto) {
-        Account account = ValidateAccount(accountDto.getId(), accountDto.getPassword());
-        SignInResponseDto signInResponseDto = new SignInResponseDto();
-        signInResponseDto
-                .setAccessTokenExpiresIn(String.valueOf(jwtService.getAccessTokenExpiresIn() / 1000))
+    public ResponseEntity<SuccessResponse<SignInDto.Response>> SignIn(
+            final SignInDto.Request request
+    ) {
+        Account account = ValidateAccount(request.getId(), request.getPassword());
+        SignInDto.Response response = new SignInDto.Response();
+        response.setAccessTokenExpiresIn(String.valueOf(jwtService.getAccessTokenExpiresIn() / 1000))
                 .setRefreshTokenExpiresIn(String.valueOf(jwtService.getRefreshTokenExpiresIn() / 1000))
                 .setAccessToken(jwtService.GenerateAccessToken(account.getId()))
                 .setRefreshToken(jwtService.GenerateRefreshToken(account.getId()));
-        return new ResponseEntity<>(new SuccessResponse<>(signInResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
     }
 
-    //NullPointerException: Invalid token
-    public ResponseEntity<SuccessResponse<String>> Refresh(final TokenDto tokenDto) {
+    // need refactor
+    public ResponseEntity<SuccessResponse<RefreshDto.Response>> Refresh(
+            final RefreshDto.Request request
+    ) {
         DecodedJWT refreshToken;
         try {
-            refreshToken = jwtService.VerifyJwt(jwtService.getRefreshTokenSecret(), tokenDto.getRefreshToken());
+            //  It's not validated on the interceptor because refreshToken is passed via body
+            refreshToken = jwtService.VerifyJwt(
+                    jwtService.getRefreshTokenSecret(),
+                    request.getRefreshToken()
+            );
         } catch (NullPointerException | JWTDecodeException e) {
             throw new ApiException(ExceptionEnum.INVALID_OR_EXPIRED_TOKEN);
         }
@@ -73,15 +79,19 @@ public class AuthService {
         if (!Objects.equals(dbRefreshTokenUuid, RequestRefreshTokenUuid))
             throw new ApiException(ExceptionEnum.INVALID_OR_EXPIRED_TOKEN);
 
-        String accessToken = jwtService.GenerateAccessToken(account.getId());
-        return new ResponseEntity<>(new SuccessResponse<>(accessToken), HttpStatus.OK);
+        RefreshDto.Response response = new RefreshDto.Response().setAccessToken(
+                jwtService.GenerateAccessToken(account.getId())
+        );
+        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<NullType>> SignOut(String authorization) {
+    public ResponseEntity<SuccessResponse<NullType>> SignOut(
+            String authorization
+    ) {
         DecodedJWT accessToken = jwtService.VerifyJwt(
                 jwtService.getAccessTokenSecret(),
-                authorization
+                authorization.replace("Bearer ", "")
         );
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = accountRepository.findByUuid(uuid);

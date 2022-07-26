@@ -2,9 +2,9 @@ package kr.pwner.fakegram.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
-import kr.pwner.fakegram.dto.account.AccountInformationDto;
-import kr.pwner.fakegram.dto.account.SignUpDto;
-import kr.pwner.fakegram.dto.account.UpdateDto;
+import kr.pwner.fakegram.dto.account.CreateAccountDto;
+import kr.pwner.fakegram.dto.account.ReadAccountDto;
+import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
@@ -37,25 +37,10 @@ public class AccountService {
         this.jwtService = jwtService;
     }
 
-    public ResponseEntity<SuccessResponse<AccountInformationDto>> ReadAccount(
-            String id
-    ) {
-        Account account = Optional.ofNullable(accountRepository.findById(id))
-                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
-
-        AccountInformationDto accountInformationDto = new AccountInformationDto();
-        accountInformationDto
-                .setId(account.getId())
-                .setName(account.getName())
-                .setEmail(account.getEmail());
-
-        return new ResponseEntity<>(new SuccessResponse<>(accountInformationDto), HttpStatus.OK);
-    }
-
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
-            final SignUpDto signUpDto
+            final CreateAccountDto.Request signUpDto
     ) {
-        if(Objects.nonNull(accountRepository.findById(signUpDto.getId())))
+        if (Objects.nonNull(accountRepository.findById(signUpDto.getId())))
             throw new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS);
 
         Account account = new Account();
@@ -75,28 +60,46 @@ public class AccountService {
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
+    public ResponseEntity<SuccessResponse<ReadAccountDto.Response>> ReadAccount(
+            final String id
+    ) {
+        Account account = Optional.ofNullable(accountRepository.findById(id))
+                .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+
+        ReadAccountDto.Response response = new ReadAccountDto.Response();
+        response.setId(account.getId())
+                .setName(account.getName())
+                .setEmail(account.getEmail());
+
+        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
+    }
+
     @Transactional(rollbackFor = {Exception.class})
     public ResponseEntity<SuccessResponse<NullType>> UpdateAccount(
-            String authorization,
-            UpdateDto updateDto
+            final String authorization,
+            final UpdateAccountDto.Request request
     ) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
-        if (Objects.isNull(updateDto.getId()) &&
-                Objects.isNull(updateDto.getPassword()) &&
-                Objects.isNull(updateDto.getEmail()) &&
-                Objects.isNull(updateDto.getName())
+        DecodedJWT accessToken = jwtService.VerifyJwt(
+                jwtService.getAccessTokenSecret(),
+                authorization.replace("Bearer ", "")
+        );
+
+        if (Objects.isNull(request.getId()) &&
+                Objects.isNull(request.getPassword()) &&
+                Objects.isNull(request.getEmail()) &&
+                Objects.isNull(request.getName())
         ) throw new ApiException(ExceptionEnum.NOTHING_INFORMATION_TO_UPDATE);
 
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
+        String encryptedPassword = bCryptPasswordEncoder.encode(request.getPassword());
         // Insert only if not null
-        String updateId = Objects.nonNull(updateDto.getId()) ? updateDto.getId() : account.getId();
-        String updatePassword = Objects.nonNull(updateDto.getPassword()) ?
-                bCryptPasswordEncoder.encode(updateDto.getPassword()) : account.getPassword();
-        String updateEmail = Objects.nonNull(updateDto.getEmail()) ? updateDto.getEmail() : account.getEmail();
-        String updateName = Objects.nonNull(updateDto.getName()) ? updateDto.getName() : account.getName();
+        String updateId = Objects.nonNull(request.getId()) ? request.getId() : account.getId();
+        String updatePassword = Objects.nonNull(request.getPassword()) ? encryptedPassword : account.getPassword();
+        String updateEmail = Objects.nonNull(request.getEmail()) ? request.getEmail() : account.getEmail();
+        String updateName = Objects.nonNull(request.getName()) ? request.getName() : account.getName();
 
         account.setId(updateId).setPassword(updatePassword).setEmail(updateEmail).setName(updateName);
 
@@ -105,9 +108,13 @@ public class AccountService {
 
     @Transactional(rollbackFor = {Exception.class})
     public ResponseEntity<SuccessResponse<NullType>> DeleteAccount(
-            String authorization
+            final String authorization
     ) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
+        DecodedJWT accessToken = jwtService.VerifyJwt(
+                jwtService.getAccessTokenSecret(),
+                authorization.replace("Bearer ", "")
+        );
+
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));

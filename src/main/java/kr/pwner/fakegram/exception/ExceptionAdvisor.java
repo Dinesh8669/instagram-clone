@@ -27,11 +27,15 @@ public class ExceptionAdvisor {
         return new ResponseEntity<>(apiErrorResponse, apiErrorResponse.getStatus());
     }
 
+//    @ExceptionHandler(IllegalArgumentException.class)
+
+    // weird
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> Path(ConstraintViolationException exception) {
         ErrorResponse apiErrorResponse = new ErrorResponse(new ApiException(ExceptionEnum.INVALID_PATH_VARIABLE));
         return new ResponseEntity<>(apiErrorResponse, apiErrorResponse.getStatus());
     }
+
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> CustomExceptionHandler(ApiException exception){
         ErrorResponse apiErrorResponse = new ErrorResponse(exception);
