@@ -1,6 +1,8 @@
 package kr.pwner.fakegram.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
+import kr.pwner.fakegram.dto.follow.FollowDto;
 import kr.pwner.fakegram.service.AccountService;
 import kr.pwner.fakegram.service.JwtService;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,10 @@ public class FollowControllerTest {
     JwtService jwtService;
     @Autowired
     MockMvc mvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
+    private final String OTHER_ID = "IDIOT";
     private final String TESTER_ID = "TeSteR";
     private final String TESTER_PW = "password123";
     private final String TESTER_EMAIL = "testtest@test.com";
@@ -37,16 +42,25 @@ public class FollowControllerTest {
                 .setEmail(TESTER_EMAIL)
                 .setName(TESTER_NAME);
         accountService.CreateAccount(request);
+
+        request = new CreateAccountDto.Request()
+                .setId(OTHER_ID)
+                .setPassword(TESTER_PW)
+                .setEmail(TESTER_EMAIL)
+                .setName(TESTER_NAME);
+        accountService.CreateAccount(request);
     }
 
     @Transactional
     @Test
-    public void Follow() throws Exception{
+    public void Follow() throws Exception {
         CreateTemporaryAccount();
         String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
+        FollowDto.Request request = new FollowDto.Request().setId(OTHER_ID);
         mvc.perform(post("/api/v1/follow")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, accessToken))
+                        .header(HttpHeaders.AUTHORIZATION, accessToken)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
 }

@@ -1,12 +1,10 @@
 package kr.pwner.fakegram.controller;
 
 import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
+import kr.pwner.fakegram.dto.follow.FollowDto;
 import kr.pwner.fakegram.service.FollowService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.type.NullType;
 
@@ -20,8 +18,10 @@ public class FollowController {
     // Follow someone with own token uuid
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<SuccessResponse<NullType>> Follow(
-            @RequestHeader(name = "Authorization") final String authorization
+            @RequestHeader(name = "Authorization") final String authorization,
+            @RequestBody final FollowDto.Request request
     ) {
-        return followService.Follow();
+        // if follow data isa exists, unfollow it
+        return followService.Follow(request);
     }
 }
