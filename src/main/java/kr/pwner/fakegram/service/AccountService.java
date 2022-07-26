@@ -16,10 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.lang.model.type.NullType;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -43,18 +41,12 @@ public class AccountService {
         if (Objects.nonNull(accountRepository.findById(signUpDto.getId())))
             throw new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS);
 
-        Account account = new Account();
-        account.setUuid(UUID.randomUUID().toString())
-                .setIsActivated(true)
-                .setId(signUpDto.getId())
-                .setPassword(bCryptPasswordEncoder.encode(signUpDto.getPassword()))
-                .setName(signUpDto.getName())
-                .setEmail(signUpDto.getEmail())
-                .setRole("USER")
-                .setCreatedAt(new Date())
-                .setUpdatedAt(new Date())
-                .setLastSignin(new Date())
-                .setRefreshTokenUuid(null);
+        Account account = Account.builder()
+                .id(signUpDto.getId())
+                .password(bCryptPasswordEncoder.encode(signUpDto.getPassword()))
+                .name(signUpDto.getName())
+                .email(signUpDto.getEmail())
+                .build();
 
         accountRepository.save(account);
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
@@ -66,8 +58,8 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findById(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
-        ReadAccountDto.Response response = new ReadAccountDto.Response();
-        response.setId(account.getId())
+        ReadAccountDto.Response response = new ReadAccountDto.Response()
+                .setId(account.getId())
                 .setName(account.getName())
                 .setEmail(account.getEmail());
 
@@ -101,8 +93,7 @@ public class AccountService {
         String updateEmail = Objects.nonNull(request.getEmail()) ? request.getEmail() : account.getEmail();
         String updateName = Objects.nonNull(request.getName()) ? request.getName() : account.getName();
 
-        account.setId(updateId).setPassword(updatePassword).setEmail(updateEmail).setName(updateName);
-
+        account.Update(updateId, updatePassword, updateName, updateEmail);
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
@@ -118,7 +109,7 @@ public class AccountService {
         String uuid = accessToken.getClaim("uuid").asString();
         Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
-        account.setIsActivated(false).setPassword("");
+        account.Delete();
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

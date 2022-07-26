@@ -97,7 +97,7 @@ public class AuthService {
         Account account = accountRepository.findByUuid(uuid);
         Optional.ofNullable(account.getRefreshTokenUuid())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ALREADY_SIGN_OUT));
-        account.setRefreshTokenUuid(null);
+        account.SignOut();
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

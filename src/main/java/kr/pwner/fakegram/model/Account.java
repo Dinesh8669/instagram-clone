@@ -1,15 +1,15 @@
 package kr.pwner.fakegram.model;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.Builder;
+import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Date;
+import java.util.UUID;
 
-@Data
-@Accessors(chain=true)
+@Getter
 @Entity(name="tb_account")
 public class Account {
     @Id // PK
@@ -45,5 +45,42 @@ public class Account {
 
     @Column()
     private String refreshTokenUuid; // null;
-}
 
+    @Builder
+    public Account(String id, String password, String name, String email) {
+        this.id = id;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+
+        this.uuid = UUID.randomUUID().toString();
+        this.isActivated = true;
+        this.role = "USER";
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+        this.lastSignin = new Date();
+        this.refreshTokenUuid = null;
+    }
+
+    public void Update(String id, String password, String name, String email){
+        this.id = id;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+    }
+
+    public void Delete(){
+        this.isActivated = false;
+        this.password = null;
+    }
+
+    public void SignIn(String refreshTokenUuid){
+        this.refreshTokenUuid = refreshTokenUuid;
+    }
+
+    public void SignOut(){
+        this.refreshTokenUuid = null;
+    }
+
+    public Account() {}
+}

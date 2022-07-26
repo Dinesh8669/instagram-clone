@@ -39,7 +39,6 @@ public class ExceptionAdvisor {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> CustomExceptionHandler(ApiException exception){
         ErrorResponse apiErrorResponse = new ErrorResponse(exception);
-
         return new ResponseEntity<>(apiErrorResponse, apiErrorResponse.getStatus());
     }
 }
