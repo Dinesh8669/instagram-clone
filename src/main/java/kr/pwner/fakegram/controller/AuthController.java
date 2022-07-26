@@ -39,7 +39,7 @@ public class AuthController {
 
     @RequestMapping(method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<SuccessResponse<NullType>> SignOut(
-            @RequestHeader(name = "Authorization") String authorization
+            @RequestHeader(name = "Authorization") final String authorization
     ) {
         return authService.SignOut(authorization);
     }

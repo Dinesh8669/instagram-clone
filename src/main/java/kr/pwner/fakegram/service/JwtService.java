@@ -46,7 +46,7 @@ public class JwtService {
     }
 
     //need to generate random access token
-    public String GenerateAccessToken(String id) {
+    public String GenerateAccessToken(final String id) {
         Account account = accountRepository.findById(id);
         return  JWT.create()
                 .withExpiresAt(new Date(getAccessTokenExpiresIn()))
@@ -55,7 +55,7 @@ public class JwtService {
     }
 
     @Transactional
-    public String GenerateRefreshToken(String id) {
+    public String GenerateRefreshToken(final String id) {
         Account account = accountRepository.findById(id);
         account.SignIn(UUID.randomUUID().toString());
         return JWT.create()
