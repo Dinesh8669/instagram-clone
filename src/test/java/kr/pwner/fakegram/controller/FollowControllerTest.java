@@ -1,6 +1,7 @@
 package kr.pwner.fakegram.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.follow.FollowDto;
 import kr.pwner.fakegram.service.AccountService;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -29,7 +31,7 @@ public class FollowControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    private final String OTHER_ID = "IDIOT";
+    private final String TARGET_ID = "IDIOT";
     private final String TESTER_ID = "TeSteR";
     private final String TESTER_PW = "password123";
     private final String TESTER_EMAIL = "testtest@test.com";
@@ -44,7 +46,7 @@ public class FollowControllerTest {
         accountService.CreateAccount(request);
 
         request = new CreateAccountDto.Request()
-                .setId(OTHER_ID)
+                .setId(TARGET_ID)
                 .setPassword(TESTER_PW)
                 .setEmail(TESTER_EMAIL)
                 .setName(TESTER_NAME);
@@ -56,11 +58,22 @@ public class FollowControllerTest {
     public void Follow() throws Exception {
         CreateTemporaryAccount();
         String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
-        FollowDto.Request request = new FollowDto.Request().setId(OTHER_ID);
-        mvc.perform(post("/api/v1/follow")
+        FollowDto.Request request = new FollowDto.Request().setTargetId(TARGET_ID);
+        mvc.perform(post("/api/v1/follow") //follow
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new SuccessResponse<>()
+                )));
+        mvc.perform(post("/api/v1/follow") //unfollow
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, accessToken)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new SuccessResponse<>()
+                )));
     }
 }

@@ -11,9 +11,9 @@ public class FollowDto {
     @Data
     @Accessors(chain = true)
     public static class Request{
-        @NotBlank(message = "id field is mandatory")
+        @NotBlank(message = "targetId field is mandatory")
         @Size(min = 4, max = 20, message = "id field must be between 4 and 20 characters")
         @Pattern(regexp = "^[a-zA-Z0-9]+", message = "^[a-zA-Z0-9]+")
-        private String id;
+        private String targetId;
     }
 }

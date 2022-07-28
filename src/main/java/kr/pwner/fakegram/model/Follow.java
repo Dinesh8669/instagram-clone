@@ -1,20 +1,28 @@
 package kr.pwner.fakegram.model;
 
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+@Getter
 @Entity(name="tb_follow")
 public class Follow {
     @Id
-    @GeneratedValue
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    private Long idx;
 
     @Column(nullable = false)
-    private String sourceId;
+    private Long sourceIdx;
 
     @Column(nullable = false)
-    private String destinationId;
+    private Long targetIdx;
+
+    public Follow() {}
+    @Builder
+    public Follow(Long sourceIdx, Long targetIdx) {
+        this.sourceIdx = sourceIdx;
+        this.targetIdx = targetIdx;
+    }
 }

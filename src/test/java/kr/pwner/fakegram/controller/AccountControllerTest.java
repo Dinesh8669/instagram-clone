@@ -26,8 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class AccountControllerTest {
     @Autowired
-    private AccountController accountController;
-    @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private JwtService jwtService;

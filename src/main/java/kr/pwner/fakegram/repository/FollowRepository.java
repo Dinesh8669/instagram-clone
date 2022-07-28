@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FollowRepository extends JpaRepository<Follow, String> {
-
+public interface FollowRepository extends JpaRepository<Follow, Long> {
+    Follow findBySourceIdxAndTargetIdx(Long sourceIdx, Long targetIdx);
+    void deleteByIdx(Long idx);
 }
