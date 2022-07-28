@@ -4,12 +4,10 @@ import kr.pwner.fakegram.model.Account;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
-
 @Repository
-public interface AccountRepository extends CrudRepository<Account, UUID> {
+public interface AccountRepository extends CrudRepository<Account, Long> {
     Account findById(String id);
-    Account findByUuid(String uuid);
-    Account findByUuidAndIsActivatedTrue(String uuid);
-    Account findByIdAndIsActivatedTrue(String uuid);
+    Account findByIdAndIsActivateTrue(String id);
+    Account findByIdx(Long idx);
+    Account findByIdxAndIsActivateTrue(Long idx);
 }

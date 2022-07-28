@@ -36,7 +36,7 @@ public class AuthService {
     }
 
     private Account ValidateAccount(final String id, final String password) {
-        Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivatedTrue(id))
+        Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         if (!bCryptPasswordEncoder.matches(password, account.getPassword()))
             throw new ApiException(ExceptionEnum.INCORRECT_ACCOUNT_PASSWORD);
@@ -69,8 +69,8 @@ public class AuthService {
         } catch (NullPointerException | JWTDecodeException e) {
             throw new ApiException(ExceptionEnum.INVALID_OR_EXPIRED_TOKEN);
         }
-        String uuid = refreshToken.getClaim("uuid").asString();
-        Account account = Optional.ofNullable(accountRepository.findByUuid(uuid))
+        Long idx = refreshToken.getClaim("idx").asLong();
+        Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
         String dbRefreshTokenUuid = account.getRefreshTokenUuid();
@@ -93,8 +93,8 @@ public class AuthService {
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
         );
-        String uuid = accessToken.getClaim("uuid").asString();
-        Account account = accountRepository.findByUuid(uuid);
+        Long idx = accessToken.getClaim("idx").asLong();
+        Account account = accountRepository.findByIdxAndIsActivateTrue(idx);
         Optional.ofNullable(account.getRefreshTokenUuid())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ALREADY_SIGN_OUT));
         account.SignOut();

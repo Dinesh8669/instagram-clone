@@ -3,21 +3,19 @@ package kr.pwner.fakegram.model;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
-@Entity(name="tb_account")
+@Entity(name = "tb_account")
 public class Account {
     @Id // PK
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private String uuid; // UUID.randomUUID().toString();
+    private Long idx; // UUID.randomUUID().toString();
 
     @Column(nullable = false)
-    private Boolean isActivated; // true;
+    private Boolean isActivate; // true;
 
     @Column(unique = true, nullable = false)
     private String id;
@@ -53,8 +51,7 @@ public class Account {
         this.name = name;
         this.email = email;
 
-        this.uuid = UUID.randomUUID().toString();
-        this.isActivated = true;
+        this.isActivate = true;
         this.role = "USER";
         this.createdAt = new Date();
         this.updatedAt = new Date();
@@ -62,25 +59,26 @@ public class Account {
         this.refreshTokenUuid = null;
     }
 
-    public void Update(String id, String password, String name, String email){
+    public void Update(String id, String password, String name, String email) {
         this.id = id;
         this.password = password;
         this.name = name;
         this.email = email;
     }
 
-    public void Delete(){
-        this.isActivated = false;
+    public void Delete() {
+        this.isActivate = false;
         this.password = null;
     }
 
-    public void SignIn(String refreshTokenUuid){
+    public void SignIn(String refreshTokenUuid) {
         this.refreshTokenUuid = refreshTokenUuid;
     }
 
-    public void SignOut(){
+    public void SignOut() {
         this.refreshTokenUuid = null;
     }
 
-    public Account() {}
+    public Account() {
+    }
 }

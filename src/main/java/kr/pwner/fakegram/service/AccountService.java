@@ -55,7 +55,7 @@ public class AccountService {
     public ResponseEntity<SuccessResponse<ReadAccountDto.Response>> ReadAccount(
             final String id
     ) {
-        Account account = Optional.ofNullable(accountRepository.findById(id))
+        Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
         ReadAccountDto.Response response = new ReadAccountDto.Response()
@@ -82,8 +82,8 @@ public class AccountService {
                 Objects.isNull(request.getName())
         ) throw new ApiException(ExceptionEnum.NOTHING_INFORMATION_TO_UPDATE);
 
-        String uuid = accessToken.getClaim("uuid").asString();
-        Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
+        Long idx = accessToken.getClaim("idx").asLong();
+        Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
         String encryptedPassword = bCryptPasswordEncoder.encode(request.getPassword());
@@ -106,8 +106,8 @@ public class AccountService {
                 authorization.replace("Bearer ", "")
         );
 
-        String uuid = accessToken.getClaim("uuid").asString();
-        Account account = Optional.ofNullable(accountRepository.findByUuidAndIsActivatedTrue(uuid))
+        Long idx = accessToken.getClaim("idx").asLong();
+        Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.Delete();
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);

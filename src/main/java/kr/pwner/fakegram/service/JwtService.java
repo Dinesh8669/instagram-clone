@@ -47,20 +47,20 @@ public class JwtService {
 
     //need to generate random access token
     public String GenerateAccessToken(final String id) {
-        Account account = accountRepository.findById(id);
+        Account account = accountRepository.findByIdAndIsActivateTrue(id);
         return  JWT.create()
                 .withExpiresAt(new Date(getAccessTokenExpiresIn()))
-                .withClaim("uuid", ((Account) account).getUuid())
+                .withClaim("idx", account.getIdx())
                 .sign(Algorithm.HMAC256(accessTokenSecret));
     }
 
     @Transactional
     public String GenerateRefreshToken(final String id) {
-        Account account = accountRepository.findById(id);
+        Account account = accountRepository.findByIdAndIsActivateTrue(id);
         account.SignIn(UUID.randomUUID().toString());
         return JWT.create()
                 .withExpiresAt(new Date(getRefreshTokenExpiresIn()))
-                .withClaim("uuid", account.getUuid())
+                .withClaim("idx", account.getIdx())
                 .withClaim("refreshTokenUuid", account.getRefreshTokenUuid())
                 .sign(Algorithm.HMAC256(refreshTokenSecret));
     }

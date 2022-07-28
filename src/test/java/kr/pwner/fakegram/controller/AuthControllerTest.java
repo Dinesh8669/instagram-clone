@@ -76,11 +76,13 @@ public class AuthControllerTest {
                 new TypeReference<>() {}
         );
 
-        String accessToken = successResponse.getData().getAccessToken();
-        DecodedJWT decodedJWT = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), accessToken);
+        DecodedJWT decodedJWT = jwtService.VerifyJwt(
+                jwtService.getAccessTokenSecret(),
+                successResponse.getData().getAccessToken()
+        );
         assertEquals(
-                decodedJWT.getClaim("uuid").asString(),
-                accountRepository.findById(TESTER_ID).getUuid()
+                decodedJWT.getClaim("idx").asLong(),
+                accountRepository.findById(TESTER_ID).getIdx()
         );
     }
 
@@ -105,10 +107,13 @@ public class AuthControllerTest {
                 successResponse.getData().getAccessToken()
         );
 
-        String uuid = accessToken.getClaim("uuid").asString();
-        Account account = accountRepository.findByUuid(uuid);
+        Long idx = accessToken.getClaim("idx").asLong();
+        Account account = accountRepository.findByIdxAndIsActivateTrue(idx);
 
-        assertEquals(uuid, account.getUuid());
+        assertEquals(
+                idx,
+                account.getIdx()
+        );
     }
 
     @Transactional
