@@ -57,11 +57,11 @@ public class JwtService {
     @Transactional
     public String GenerateRefreshToken(final String id) {
         Account account = accountRepository.findByIdAndIsActivateTrue(id);
-        account.SignIn(UUID.randomUUID().toString());
+        account.SaveRefreshToken(UUID.randomUUID().toString());
         return JWT.create()
                 .withExpiresAt(new Date(getRefreshTokenExpiresIn()))
                 .withClaim("idx", account.getIdx())
-                .withClaim("refreshTokenUuid", account.getRefreshTokenUuid())
+                .withClaim("refreshToken", account.getRefreshToken())
                 .sign(Algorithm.HMAC256(refreshTokenSecret));
     }
 }

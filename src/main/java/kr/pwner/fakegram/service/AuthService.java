@@ -73,10 +73,10 @@ public class AuthService {
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
-        String dbRefreshTokenUuid = account.getRefreshTokenUuid();
-        String RequestRefreshTokenUuid = refreshToken.getClaim("refreshTokenUuid").asString();
+        String dbRefreshToken = account.getRefreshToken();
+        String RequestRefreshToken = refreshToken.getClaim("refreshToken").asString();
 
-        if (!Objects.equals(dbRefreshTokenUuid, RequestRefreshTokenUuid))
+        if (!Objects.equals(dbRefreshToken, RequestRefreshToken))
             throw new ApiException(ExceptionEnum.INVALID_OR_EXPIRED_TOKEN);
 
         RefreshDto.Response response = new RefreshDto.Response().setAccessToken(
@@ -95,7 +95,7 @@ public class AuthService {
         );
         Long idx = accessToken.getClaim("idx").asLong();
         Account account = accountRepository.findByIdxAndIsActivateTrue(idx);
-        Optional.ofNullable(account.getRefreshTokenUuid())
+        Optional.ofNullable(account.getRefreshToken())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ALREADY_SIGN_OUT));
         account.SignOut();
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);

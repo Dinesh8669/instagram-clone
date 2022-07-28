@@ -42,7 +42,7 @@ public class Account {
     private Date lastSignin; // new Date();
 
     @Column()
-    private String refreshTokenUuid; // null;
+    private String refreshToken; // null;
 
     @Builder
     public Account(String id, String password, String name, String email) {
@@ -56,7 +56,7 @@ public class Account {
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.lastSignin = new Date();
-        this.refreshTokenUuid = null;
+        this.refreshToken = null;
     }
 
     public void Update(String id, String password, String name, String email) {
@@ -71,12 +71,12 @@ public class Account {
         this.password = null;
     }
 
-    public void SignIn(String refreshTokenUuid) {
-        this.refreshTokenUuid = refreshTokenUuid;
+    public void SaveRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public void SignOut() {
-        this.refreshTokenUuid = null;
+        this.refreshToken = null;
     }
 
     public Account() {
