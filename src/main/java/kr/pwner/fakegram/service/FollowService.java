@@ -17,7 +17,6 @@ import javax.lang.model.type.NullType;
 import java.util.Objects;
 import java.util.Optional;
 
-@Transactional
 @Service
 public class FollowService {
     FollowRepository followRepository;
@@ -34,6 +33,7 @@ public class FollowService {
         this.jwtService = jwtService;
     }
 
+    @Transactional
     public ResponseEntity<SuccessResponse<NullType>> Follow(
             String authorization,
             FollowDto.Request request
