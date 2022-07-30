@@ -57,7 +57,7 @@ public class JwtService {
     @Transactional
     public String GenerateRefreshToken(final String id) {
         Account account = accountRepository.findByIdAndIsActivateTrue(id);
-        account.SaveRefreshToken(UUID.randomUUID().toString());
+        account.SignIn(UUID.randomUUID().toString());
         return JWT.create()
                 .withExpiresAt(new Date(getRefreshTokenExpiresIn()))
                 .withClaim("idx", account.getIdx())

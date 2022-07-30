@@ -68,6 +68,7 @@ public class Account {
         this.password = Objects.nonNull(account.getPassword()) ? encryptedPassword : this.getPassword();
         this.email = Objects.nonNull(account.getEmail()) ? account.getEmail() : this.getEmail();
         this.name = Objects.nonNull(account.getName()) ? account.getName() : this.getName();
+        this.updatedAt = new Date();
     }
 
     public void Delete() {
@@ -75,8 +76,9 @@ public class Account {
         this.password = null;
     }
 
-    public void SaveRefreshToken(String refreshToken) {
+    public void SignIn(String refreshToken) {
         this.refreshToken = refreshToken;
+        this.lastSignIn = new Date();
     }
 
     public void SignOut() {
