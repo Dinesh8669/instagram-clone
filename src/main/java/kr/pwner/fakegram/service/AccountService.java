@@ -9,6 +9,7 @@ import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
+import kr.pwner.fakegram.repository.FollowRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.lang.model.type.NullType;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -24,15 +27,18 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
+    private final FollowRepository followRepository;
 
     public AccountService(
             AccountRepository accountRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            FollowRepository followRepository
     ) {
         this.accountRepository = accountRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtService = jwtService;
+        this.followRepository = followRepository;
     }
 
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
@@ -57,11 +63,16 @@ public class AccountService {
     ) {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+        // ToDo: Add test code
+        List<Map<String, String>> follower = followRepository.getFollowerByIdx(account.getIdx());
+        List<Map<String, String>> following = followRepository.getFollowingByIdx(account.getIdx());
 
         ReadAccountDto.Response response = new ReadAccountDto.Response()
                 .setId(account.getId())
                 .setName(account.getName())
-                .setEmail(account.getEmail());
+                .setEmail(account.getEmail())
+                .setFollower(follower)
+                .setFollowing(following);
 
         return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
     }

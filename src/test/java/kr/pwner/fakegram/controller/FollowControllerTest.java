@@ -5,6 +5,7 @@ import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.follow.FollowDto;
 import kr.pwner.fakegram.service.AccountService;
+import kr.pwner.fakegram.service.FollowService;
 import kr.pwner.fakegram.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class FollowControllerTest {
     MockMvc mvc;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    FollowService followService;
 
     private final String TARGET_ID = "IDIOT";
     private final String TESTER_ID = "TeSteR";

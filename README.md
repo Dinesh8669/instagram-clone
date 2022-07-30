@@ -2,12 +2,10 @@
 
 # Fakegram
 
-# To-Do
-* File upload
-
 # Features
 - [x] Account(Sign-in, Sign-out, Delete account)
-- [x] Follow, Unfollow
+- [x] Show user profiles(id, name, email, follower and following)
+- [x] Follow, Unfollow, 
 - [ ] File upload
 - [ ] Upload post
 - [ ] Comment
