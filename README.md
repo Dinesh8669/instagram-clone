@@ -8,6 +8,7 @@
 # Features
 - [x] Account(Sign-in, Sign-out, Delete account)
 - [x] Follow, Unfollow
+- [ ] File upload
 - [ ] Upload post
 - [ ] Comment
 - [ ] Social sign-in
