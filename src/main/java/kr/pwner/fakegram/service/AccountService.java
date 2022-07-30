@@ -47,8 +47,8 @@ public class AccountService {
                 .name(signUpDto.getName())
                 .email(signUpDto.getEmail())
                 .build();
-
         accountRepository.save(account);
+
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
@@ -85,15 +85,8 @@ public class AccountService {
         Long idx = accessToken.getClaim("idx").asLong();
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
+        account.Update(request);
 
-        String encryptedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-        // Insert only if not null
-        String updateId = Objects.nonNull(request.getId()) ? request.getId() : account.getId();
-        String updatePassword = Objects.nonNull(request.getPassword()) ? encryptedPassword : account.getPassword();
-        String updateEmail = Objects.nonNull(request.getEmail()) ? request.getEmail() : account.getEmail();
-        String updateName = Objects.nonNull(request.getName()) ? request.getName() : account.getName();
-
-        account.Update(updateId, updatePassword, updateName, updateEmail);
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
@@ -110,6 +103,7 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.Delete();
+
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

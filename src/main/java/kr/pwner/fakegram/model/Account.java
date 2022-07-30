@@ -1,10 +1,13 @@
 package kr.pwner.fakegram.model;
 
+import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Getter
 @Entity(name = "tb_account")
@@ -39,7 +42,7 @@ public class Account {
     private Date updatedAt; // new Date();
 
     @Column(nullable = false)
-    private Date lastSignin; // new Date();
+    private Date lastSignIn; // new Date();
 
     @Column()
     private String refreshToken; // null;
@@ -55,15 +58,16 @@ public class Account {
         this.role = "USER";
         this.createdAt = new Date();
         this.updatedAt = new Date();
-        this.lastSignin = new Date();
+        this.lastSignIn = new Date();
         this.refreshToken = null;
     }
 
-    public void Update(String id, String password, String name, String email) {
-        this.id = id;
-        this.password = password;
-        this.name = name;
-        this.email = email;
+    public void Update(UpdateAccountDto.Request account) {
+        String encryptedPassword = new BCryptPasswordEncoder().encode(account.getPassword());
+        this.id = Objects.nonNull(account.getId()) ? account.getId() : this.getId();
+        this.password = Objects.nonNull(account.getPassword()) ? encryptedPassword : this.getPassword();
+        this.email = Objects.nonNull(account.getEmail()) ? account.getEmail() : this.getEmail();
+        this.name = Objects.nonNull(account.getName()) ? account.getName() : this.getName();
     }
 
     public void Delete() {
