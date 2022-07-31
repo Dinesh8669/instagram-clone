@@ -87,11 +87,9 @@ public class AccountControllerTest {
         FollowDto.Request followDto = new FollowDto.Request().setTargetId(TESTER_ID);
         followService.Follow(jwtService.GenerateAccessToken(OTHER_ID), followDto);
 
-
         List<Map<String, String>> follower = followRepository.getFollowerByIdx(
                 accountRepository.findById(TESTER_ID).getIdx()
         );
-
         List<Map<String, String>> following = followRepository.getFollowingByIdx(
                 accountRepository.findById(TESTER_ID).getIdx()
         );
