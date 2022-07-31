@@ -33,8 +33,6 @@ public class FollowService {
         this.jwtService = jwtService;
     }
 
-    // ToDo: create GetFollowing and GetFollower. Use raw queries.
-
     @Transactional
     public ResponseEntity<SuccessResponse<NullType>> Follow(
             String authorization,

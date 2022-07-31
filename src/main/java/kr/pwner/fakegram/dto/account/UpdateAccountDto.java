@@ -1,12 +1,14 @@
 package kr.pwner.fakegram.dto.account;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class UpdateAccountDto {
     @Data
+    @Accessors(chain = true)
     public static class Request {
         @Size(min = 4, max = 20, message = "id field must be between 4 and 20 characters")
         @Pattern(regexp = "^[a-zA-Z0-9]+", message = "^[a-zA-Z0-9]+")
