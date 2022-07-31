@@ -10,3 +10,7 @@
 - [ ] Upload post
 - [ ] Comment
 - [ ] Social sign-in
+
+# Contribution
+
+Report issues or open pull requests with improvements  
