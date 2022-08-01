@@ -32,8 +32,9 @@ public class Account {
     @Column(nullable = false)
     private String email;
 
+    @Enumerated()
     @Column(nullable = false)
-    private String role; // "USER";
+    private AccountRole role; // "USER";
 
     @Column(nullable = false)
     private Date createdAt; // new Date();
@@ -44,8 +45,9 @@ public class Account {
     @Column(nullable = false)
     private Date lastSignIn; // new Date();
 
-    @Column()
     private String refreshToken; // null;
+
+    private String profilePicture;
 
     @Builder
     public Account(String id, String password, String name, String email) {
@@ -55,11 +57,12 @@ public class Account {
         this.email = email;
 
         this.isActivate = true;
-        this.role = "USER";
+        this.role = AccountRole.USER;
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.lastSignIn = new Date();
         this.refreshToken = null;
+        this.profilePicture = null;
     }
 
     public void Update(UpdateAccountDto.Request account) {
@@ -85,6 +88,14 @@ public class Account {
         this.refreshToken = null;
     }
 
+    public void UploadProfilePicture(String fileUuid){
+        this.profilePicture = fileUuid;
+    }
+
     public Account() {
     }
+}
+
+enum AccountRole{
+    USER, ADMIN
 }

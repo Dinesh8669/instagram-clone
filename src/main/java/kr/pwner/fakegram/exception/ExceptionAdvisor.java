@@ -6,8 +6,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,16 +30,15 @@ public class ExceptionAdvisor {
 
 //    @ExceptionHandler(IllegalArgumentException.class)
 
-    // weird
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> Path(ConstraintViolationException exception) {
-        ErrorResponse apiErrorResponse = new ErrorResponse(new ApiException(ExceptionEnum.INVALID_PATH_VARIABLE));
-        return new ResponseEntity<>(apiErrorResponse, apiErrorResponse.getStatus());
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponse> ApiExceptionHandler(ApiException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception);
+        return new ResponseEntity<>(errorResponse, errorResponse.getStatus());
     }
 
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorResponse> CustomExceptionHandler(ApiException exception){
-        ErrorResponse apiErrorResponse = new ErrorResponse(exception);
-        return new ResponseEntity<>(apiErrorResponse, apiErrorResponse.getStatus());
+    @ExceptionHandler({MissingServletRequestPartException.class, MultipartException.class})
+    public ResponseEntity<ErrorResponse> MultipartException(){
+        ErrorResponse errorResponse = new ErrorResponse(new ApiException(ExceptionEnum.INVALID_MULTIPART_REQUEST));
+        return new ResponseEntity<>(errorResponse, errorResponse.getStatus());
     }
 }

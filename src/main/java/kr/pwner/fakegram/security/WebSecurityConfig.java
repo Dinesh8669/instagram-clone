@@ -31,16 +31,17 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
-        JwtInterceptor UserInterceptor = (JwtInterceptor) jwtInterceptor.clone();
+        JwtInterceptor AccountInterceptor = (JwtInterceptor) jwtInterceptor.clone();
+        JwtInterceptor AccountUploadInterceptor = (JwtInterceptor) jwtInterceptor.clone();
         JwtInterceptor AuthInterceptor = (JwtInterceptor) jwtInterceptor.clone();
         JwtInterceptor FollowInterceptor = (JwtInterceptor) jwtInterceptor.clone();
 
-        registry.addInterceptor(UserInterceptor.setExcludeMethodList(Arrays.asList("GET", "POST")))
+        registry.addInterceptor(AccountInterceptor.setExcludeMethodList(Arrays.asList("GET", "POST")))
                 .order(0).addPathPatterns("/api/*/account");
+        registry.addInterceptor(AccountUploadInterceptor).order(0).addPathPatterns("/api/*/account/upload/*");
         registry.addInterceptor(AuthInterceptor.setExcludeMethodList(Arrays.asList("POST", "PUT")))
                 .order(0).addPathPatterns("/api/*/auth");
-        registry.addInterceptor(FollowInterceptor)
-                .order(0).addPathPatterns("/api/*/follow");
+        registry.addInterceptor(FollowInterceptor).order(0).addPathPatterns("/api/*/follow");
     }
 
     @Bean

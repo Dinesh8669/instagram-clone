@@ -5,8 +5,9 @@
 # Features
 - [x] Account(Sign-in, Sign-out, Delete account)
 - [x] Show user profiles(id, name, email, follower and following)
-- [x] Follow, Unfollow, 
-- [ ] File upload
+- [x] Follow, Unfollow
+- [x] File upload (Profile picture)
+- [ ] File Download
 - [ ] Upload post
 - [ ] Comment
 - [ ] Social sign-in

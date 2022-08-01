@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
 import java.util.List;
@@ -28,17 +29,20 @@ public class AccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
     private final FollowRepository followRepository;
+    private final UploadService uploadService;
 
     public AccountService(
             AccountRepository accountRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtService jwtService,
-            FollowRepository followRepository
+            FollowRepository followRepository,
+            UploadService uploadService
     ) {
         this.accountRepository = accountRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtService = jwtService;
         this.followRepository = followRepository;
+        this.uploadService = uploadService;
     }
 
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
@@ -116,6 +120,24 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.Delete();
+
+        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public ResponseEntity<SuccessResponse<NullType>> UploadProfilePicture(
+            final String authorization,
+            final MultipartFile file
+    ){
+        DecodedJWT accessToken = jwtService.VerifyJwt(
+                jwtService.getAccessTokenSecret(),
+                authorization.replace("Bearer ", "")
+        );
+        String fileUuid = this.uploadService.UploadFile(authorization, file);
+        Account account = accountRepository.findByIdx(accessToken.getClaim("idx").asLong());
+        account.UploadProfilePicture(fileUuid);
+
+        accessToken.getClaim("idx");
 
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }

@@ -5,8 +5,10 @@ import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import kr.pwner.fakegram.service.AccountService;
+import kr.pwner.fakegram.service.UploadService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
 import javax.validation.Valid;
@@ -17,7 +19,8 @@ public class AccountController {
     private final AccountService accountService;
 
     public AccountController(
-            final AccountService accountService
+            final AccountService accountService,
+            final UploadService uploadService
     ) {
         this.accountService = accountService;
     }
@@ -36,7 +39,6 @@ public class AccountController {
         return accountService.ReadAccount(id);
     }
 
-
     @RequestMapping(method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<SuccessResponse<NullType>> UpdateAccount(
             @RequestHeader(name = "Authorization") final String authorization,
@@ -50,5 +52,13 @@ public class AccountController {
             @RequestHeader(name = "Authorization") final String authorization
     ) {
         return accountService.DeleteAccount(authorization);
+    }
+
+    @RequestMapping(value="/upload/profilePicture", method= RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<SuccessResponse<NullType>> UploadProfilePicture(
+            @RequestHeader(name ="Authorization") String authorization,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return accountService.UploadProfilePicture(authorization, file);
     }
 }
