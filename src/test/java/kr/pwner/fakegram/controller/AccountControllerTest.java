@@ -77,7 +77,6 @@ public class AccountControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
     }
 
-    // ToDo: Refactor auth and follow test code
     @Transactional
     @Test
     public void ReadAccount() throws Exception {
