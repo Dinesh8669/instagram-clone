@@ -40,16 +40,9 @@ public class FollowControllerTest {
     private final String TESTER_EMAIL = "testtest@test.com";
     private final String TESTER_NAME = "tester!";
 
-    private void CreateTemporaryAccount() {
+    private void CreateTemporaryAccount(String id) {
         CreateAccountDto.Request request = new CreateAccountDto.Request()
-                .setId(TESTER_ID)
-                .setPassword(TESTER_PW)
-                .setEmail(TESTER_EMAIL)
-                .setName(TESTER_NAME);
-        accountService.CreateAccount(request);
-
-        request = new CreateAccountDto.Request()
-                .setId(TARGET_ID)
+                .setId(id)
                 .setPassword(TESTER_PW)
                 .setEmail(TESTER_EMAIL)
                 .setName(TESTER_NAME);
@@ -59,7 +52,8 @@ public class FollowControllerTest {
     @Transactional
     @Test
     public void Follow() throws Exception {
-        CreateTemporaryAccount();
+        CreateTemporaryAccount(TESTER_ID);
+        CreateTemporaryAccount(TARGET_ID);
         String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
         FollowDto.Request request = new FollowDto.Request().setTargetId(TARGET_ID);
         mvc.perform(post("/api/v1/follow") //follow
