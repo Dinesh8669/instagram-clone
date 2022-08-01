@@ -101,6 +101,8 @@ public class AccountService {
         return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
+
+    // ToDo: If the account is deleted, delete related follow list
     @Transactional(rollbackFor = {Exception.class})
     public ResponseEntity<SuccessResponse<NullType>> DeleteAccount(
             final String authorization
