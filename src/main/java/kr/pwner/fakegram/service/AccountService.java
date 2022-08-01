@@ -63,7 +63,7 @@ public class AccountService {
     ) {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
-        // ToDo: Add test code
+
         List<Map<String, String>> follower = followRepository.getFollowerByIdx(account.getIdx());
         List<Map<String, String>> following = followRepository.getFollowingByIdx(account.getIdx());
 
