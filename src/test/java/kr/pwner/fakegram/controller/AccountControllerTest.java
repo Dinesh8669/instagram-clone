@@ -135,4 +135,5 @@ public class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
     }
+
 }

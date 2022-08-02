@@ -17,13 +17,13 @@ public class Upload {
     private Long accountIdx;
 
     @Column(nullable = false)
-    private String fileUuid;
+    private String fileFullName;
 
     public Upload(){}
 
     @Builder
-    public Upload(Long accountIdx, String fileUuid){
+    public Upload(Long accountIdx, String fileFullName){
         this.accountIdx = accountIdx;
-        this.fileUuid = fileUuid;
+        this.fileFullName = fileFullName;
     }
 }

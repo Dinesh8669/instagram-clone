@@ -5,6 +5,7 @@ import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Upload;
 import kr.pwner.fakegram.repository.UploadRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,12 +18,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
-public class UploadService {
+public class FileService {
     private final Path uploadLocation;
     private final JwtService jwtService;
     private final UploadRepository uploadRepository;
 
-    public UploadService(JwtService jwtService, UploadRepository uploadRepository) throws IOException {
+    public FileService(JwtService jwtService, UploadRepository uploadRepository) throws IOException {
         this.jwtService = jwtService;
         this.uploadRepository = uploadRepository;
 
@@ -30,7 +31,7 @@ public class UploadService {
         Files.createDirectories(this.uploadLocation);
     }
 
-    public String UploadFile(
+    public String FileUpload(
             String authorization,
             MultipartFile file
     ) {
@@ -46,8 +47,10 @@ public class UploadService {
             throw new ApiException(ExceptionEnum.INVALID_FILE_NAME);
 
         //  for security, don't use user's  filename
-        String fileUuid = UUID.randomUUID().toString();
-        Path fileLocation = this.uploadLocation.resolve(fileUuid);
+        String fileFullName = UUID.randomUUID().toString() + "." +
+                FilenameUtils.getExtension(file.getOriginalFilename());
+
+        Path fileLocation = this.uploadLocation.resolve(fileFullName);
 
         try {
             Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -55,15 +58,11 @@ public class UploadService {
             throw new ApiException(ExceptionEnum.COULD_NOT_SAVE_THE_FILE);
         }
         // save file attribute to db
-
         Upload upload = Upload.builder()
                 .accountIdx(accessToken.getClaim("idx").asLong())
-                .fileUuid(fileUuid)
+                .fileFullName(fileFullName)
                 .build();
-
         uploadRepository.save(upload);
-
-        return fileUuid;
+        return fileFullName;
     }
-
 }

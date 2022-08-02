@@ -5,15 +5,13 @@ import kr.pwner.fakegram.dto.auth.RefreshDto;
 import kr.pwner.fakegram.dto.auth.SignInDto;
 import kr.pwner.fakegram.service.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.type.NullType;
 import javax.validation.Valid;
 
-@Validated
-@RestController
 @RequestMapping(path = "/api/v1/auth")
+@RestController
 public class AuthController {
     private final AuthService authService;
 

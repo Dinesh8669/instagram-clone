@@ -10,12 +10,14 @@ import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.lang.model.type.NullType;
 import java.util.List;
@@ -29,20 +31,20 @@ public class AccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
     private final FollowRepository followRepository;
-    private final UploadService uploadService;
+    private final FileService fileService;
 
     public AccountService(
             AccountRepository accountRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtService jwtService,
             FollowRepository followRepository,
-            UploadService uploadService
+            FileService fileService
     ) {
         this.accountRepository = accountRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtService = jwtService;
         this.followRepository = followRepository;
-        this.uploadService = uploadService;
+        this.fileService = fileService;
     }
 
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
@@ -125,7 +127,7 @@ public class AccountService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<NullType>> UploadProfilePicture(
+    public ResponseEntity<SuccessResponse<String>> UploadProfilePicture(
             final String authorization,
             final MultipartFile file
     ){
@@ -133,12 +135,19 @@ public class AccountService {
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
         );
-        String fileUuid = this.uploadService.UploadFile(authorization, file);
+        // Check image file have a valid format
+        String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if(!Objects.equals(fileExtension, "jpg") && !Objects.equals(fileExtension, "png"))
+            throw new ApiException(ExceptionEnum.UNSUPPORTED_IMAGE_FORMAT);
+
+        String fileFullName = this.fileService.FileUpload(authorization, file);
         Account account = accountRepository.findByIdx(accessToken.getClaim("idx").asLong());
-        account.UploadProfilePicture(fileUuid);
+        account.UploadProfilePicture(fileFullName);
 
-        accessToken.getClaim("idx");
-
-        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
+        String fileUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/uploads/")
+                .path(fileFullName)
+                .toUriString();
+        return new ResponseEntity<>(new SuccessResponse<>(fileUri), HttpStatus.OK);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
@@ -42,6 +43,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         registry.addInterceptor(AuthInterceptor.setExcludeMethodList(Arrays.asList("POST", "PUT")))
                 .order(0).addPathPatterns("/api/*/auth");
         registry.addInterceptor(FollowInterceptor).order(0).addPathPatterns("/api/*/follow");
+    }
+
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:./uploads/");
     }
 
     @Bean

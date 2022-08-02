@@ -18,6 +18,8 @@ public enum ExceptionEnum {
     EMPTY_FILE("008", "File is empty", HttpStatus.NOT_ACCEPTABLE),
     INVALID_MULTIPART_REQUEST("009", "Invalid multipart request", HttpStatus.BAD_REQUEST),
     COULD_NOT_SAVE_THE_FILE("010", "Could not save the file", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNSUPPORTED_IMAGE_FORMAT("012", "Unsupported image format(.jpg, .png)", HttpStatus.NOT_ACCEPTABLE),
+
     // Request Validation
     INVALID_REQUEST_BODY("100", "Invalid Request Body",HttpStatus.BAD_REQUEST),
     INVALID_PATH_VARIABLE("101", "Invalid Path Variable", HttpStatus.BAD_REQUEST)
