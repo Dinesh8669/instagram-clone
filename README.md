@@ -7,7 +7,7 @@
 - [x] Show user profiles(id, name, email, follower and following)
 - [x] Follow, Unfollow
 - [x] File upload (Profile picture)
-- [ ] Post Upload
+- [ ] Feed Upload
 - [ ] Comment
 - [ ] Social sign-in
 
