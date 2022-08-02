@@ -9,6 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +32,12 @@ public class FileService {
         Files.createDirectories(this.uploadLocation);
     }
 
+    public static String getFileUri(String fileFullName){
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/uploads/")
+                .path(fileFullName)
+                .toUriString();
+    }
     public String FileUpload(
             String authorization,
             MultipartFile file

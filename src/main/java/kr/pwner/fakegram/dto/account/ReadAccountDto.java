@@ -14,6 +14,7 @@ public class ReadAccountDto {
         private String id;
         private String name;
         private String email;
+        private String profilePicture;
         private List<Map<String, String>> follower;
         private List<Map<String, String>> following;
     }

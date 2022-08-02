@@ -6,9 +6,11 @@ import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import kr.pwner.fakegram.dto.follow.FollowDto;
+import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
 import kr.pwner.fakegram.service.AccountService;
+import kr.pwner.fakegram.service.FileService;
 import kr.pwner.fakegram.service.FollowService;
 import kr.pwner.fakegram.service.JwtService;
 import org.junit.jupiter.api.Test;
@@ -93,10 +95,13 @@ public class AccountControllerTest {
                 accountRepository.findById(TESTER_ID).getIdx()
         );
 
+        Account account = accountRepository.findById(TESTER_ID);
+
         ReadAccountDto.Response response = new ReadAccountDto.Response()
                 .setId(TESTER_ID)
                 .setName(TESTER_NAME)
                 .setEmail(TESTER_EMAIL)
+                .setProfilePicture(FileService.getFileUri(account.getProfilePicture()))
                 .setFollower(follower)
                 .setFollowing(following);
 

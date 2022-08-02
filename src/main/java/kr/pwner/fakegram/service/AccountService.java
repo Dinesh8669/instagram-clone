@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.lang.model.type.NullType;
 import java.util.List;
@@ -77,6 +76,7 @@ public class AccountService {
                 .setId(account.getId())
                 .setName(account.getName())
                 .setEmail(account.getEmail())
+                .setProfilePicture(FileService.getFileUri(account.getProfilePicture()))
                 .setFollower(follower)
                 .setFollowing(following);
 
@@ -144,10 +144,6 @@ public class AccountService {
         Account account = accountRepository.findByIdx(accessToken.getClaim("idx").asLong());
         account.UploadProfilePicture(fileFullName);
 
-        String fileUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
-                .path(fileFullName)
-                .toUriString();
-        return new ResponseEntity<>(new SuccessResponse<>(fileUri), HttpStatus.OK);
+        return new ResponseEntity<>(new SuccessResponse<>(FileService.getFileUri(fileFullName)), HttpStatus.OK);
     }
 }
