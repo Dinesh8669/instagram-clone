@@ -18,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.lang.model.type.NullType;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -141,4 +143,21 @@ public class AccountControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
     }
 
+    @Transactional
+    @Test
+    public void UploadProfilePicture() throws Exception {
+        CreateTemporaryAccount(TESTER_ID);
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "shit.jpg",
+                "image/png",
+                new FileInputStream("./src/test/java/kr/pwner/fakegram/image/image.jpg")
+        );
+        mvc.perform(multipart("/api/v1/account/upload/profilePicture")
+                .file(file)
+                .header(HttpHeaders.AUTHORIZATION, jwtService.GenerateAccessToken(TESTER_ID))
+        ).andExpect(status().isOk());
+    }
+
 }
+

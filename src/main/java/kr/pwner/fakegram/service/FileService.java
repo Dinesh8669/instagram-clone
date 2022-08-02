@@ -32,12 +32,13 @@ public class FileService {
         Files.createDirectories(this.uploadLocation);
     }
 
-    public static String getFileUri(String fileFullName){
+    public static String getFileUri(String fileFullName) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
                 .path(fileFullName)
                 .toUriString();
     }
+
     public String FileUpload(
             String authorization,
             MultipartFile file
