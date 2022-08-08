@@ -1,29 +1,32 @@
 package kr.pwner.fakegram.model;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NoArgsConstructor
 @Getter
-@Entity(name="tb_upload")
+@Entity
 public class Upload {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long idx;
 
-    @Column(nullable=false)
-    private Long accountIdx;
-
     @Column(nullable = false)
-    private String fileFullName;
-
-    public Upload(){}
-
-    @Builder
-    public Upload(Long accountIdx, String fileFullName){
-        this.accountIdx = accountIdx;
-        this.fileFullName = fileFullName;
-    }
+    private String fileName;
+//
+//    // * Relation Mapping
+//    @Setter
+//    @ManyToOne(cascade=CascadeType.ALL)
+//    @JoinColumn(name="ACCOUNT_IDX")
+//    private Account account;
+//
+//    // * Methods
+//    @Builder
+//    public Upload(Account account, String fileName){
+//        this.account = account
+//        this.fileName = fileName;
+//    }
 }

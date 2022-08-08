@@ -3,22 +3,24 @@ package kr.pwner.fakegram.model;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
+@NoArgsConstructor
 @Getter
-@Entity(name = "tb_account")
+@Entity
 public class Account {
-    @Id // PK
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Long idx; // UUID.randomUUID().toString();
+    private Long idx;
 
     @Column(nullable = false)
-    private Boolean isActivate; // true;
+    private Boolean isActivate;
 
     @Column(unique = true, nullable = false)
     private String id;
@@ -34,27 +36,33 @@ public class Account {
 
     @Enumerated()
     @Column(nullable = false)
-    private AccountRole role; // "USER";
+    private AccountRole role;
 
     @Column(nullable = false)
-    private Date createdAt; // new Date();
+    private Date createdAt;
 
     @Column(nullable = false)
-    private Date updatedAt; // new Date();
+    private Date updatedAt;
 
     @Column(nullable = false)
-    private Date lastSignIn; // new Date();
+    private Date lastSignIn;
 
-    private String refreshToken; // null;
+    private String refreshToken;
 
-    private String profilePicture;
+    private String profileImage;
+//    // * Relation Mapping
+//    @Setter
+//    @OneToOne(mappedBy = "Account", fetch = FetchType.EAGER)
+//    private Upload profilePicture;
 
+    // * Methods
     @Builder
-    public Account(String id, String password, String name, String email) {
+    public Account(String id, String password, String name, String email, String profileImage) {
         this.id = id;
         this.password = password;
         this.name = name;
         this.email = email;
+
 
         this.isActivate = true;
         this.role = AccountRole.USER;
@@ -62,7 +70,6 @@ public class Account {
         this.updatedAt = new Date();
         this.lastSignIn = new Date();
         this.refreshToken = null;
-        this.profilePicture = null;
     }
 
     public void Update(UpdateAccountDto.Request account) {
@@ -88,14 +95,12 @@ public class Account {
         this.refreshToken = null;
     }
 
-    public void UploadProfilePicture(String fileUuid){
-        this.profilePicture = fileUuid;
-    }
-
-    public Account() {
+    public void ProfileImage(String profileImage){
+        this.profileImage = profileImage;
     }
 }
 
-enum AccountRole{
+// * Enums
+enum AccountRole {
     USER, ADMIN
 }

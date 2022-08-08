@@ -5,7 +5,6 @@ import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import kr.pwner.fakegram.service.AccountService;
-import kr.pwner.fakegram.service.FileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,10 +17,7 @@ import javax.validation.Valid;
 public class AccountController {
     private final AccountService accountService;
 
-    public AccountController(
-            final AccountService accountService,
-            final FileService fileService
-    ) {
+    public AccountController(final AccountService accountService) {
         this.accountService = accountService;
     }
 
@@ -54,11 +50,11 @@ public class AccountController {
         return accountService.DeleteAccount(authorization);
     }
 
-    @RequestMapping(value="/upload/profilePicture", method= RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<SuccessResponse<String>> UploadProfilePicture(
-            @RequestHeader(name ="Authorization") String authorization,
+    @RequestMapping(value = "/upload/profileImage", method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<SuccessResponse<String>> UploadProfileImage(
+            @RequestHeader(name = "Authorization") String authorization,
             @RequestParam("file") MultipartFile file
     ) {
-        return accountService.UploadProfilePicture(authorization, file);
+        return accountService.UploadProfileImage(authorization, file);
     }
 }

@@ -13,7 +13,7 @@ import javax.validation.Valid;
 @RestController
 public class FollowController {
     FollowService followService;
-    public FollowController(FollowService followService){
+    public FollowController(final FollowService followService){
         this.followService = followService;
     }
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")

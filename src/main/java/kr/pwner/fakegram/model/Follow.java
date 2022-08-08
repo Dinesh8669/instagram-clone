@@ -6,7 +6,7 @@ import lombok.Getter;
 import javax.persistence.*;
 
 @Getter
-@Entity(name="tb_follow")
+@Entity
 public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

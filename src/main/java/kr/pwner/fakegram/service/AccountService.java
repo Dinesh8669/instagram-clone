@@ -10,6 +10,7 @@ import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
+import kr.pwner.fakegram.repository.UploadRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,20 +31,23 @@ public class AccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtService jwtService;
     private final FollowRepository followRepository;
-    private final FileService fileService;
+    private final UploadService uploadService;
+    private final UploadRepository uploadRepository;
 
     public AccountService(
             AccountRepository accountRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtService jwtService,
             FollowRepository followRepository,
-            FileService fileService
+            UploadService uploadService,
+            UploadRepository uploadRepository
     ) {
         this.accountRepository = accountRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtService = jwtService;
         this.followRepository = followRepository;
-        this.fileService = fileService;
+        this.uploadService = uploadService;
+        this.uploadRepository = uploadRepository;
     }
 
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
@@ -72,11 +76,13 @@ public class AccountService {
         List<Map<String, String>> follower = followRepository.getFollowerByIdx(account.getIdx());
         List<Map<String, String>> following = followRepository.getFollowingByIdx(account.getIdx());
 
+
+
         ReadAccountDto.Response response = new ReadAccountDto.Response()
                 .setId(account.getId())
                 .setName(account.getName())
                 .setEmail(account.getEmail())
-                .setProfilePicture(FileService.getFileUri(account.getProfilePicture()))
+                .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
                 .setFollower(follower)
                 .setFollowing(following);
 
@@ -127,7 +133,7 @@ public class AccountService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<String>> UploadProfilePicture(
+    public ResponseEntity<SuccessResponse<String>> UploadProfileImage(
             final String authorization,
             final MultipartFile file
     ){
@@ -135,15 +141,15 @@ public class AccountService {
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
         );
-        // Check image file have a valid format
+
+        // * Check image file have a valid format
         String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
         if(!Objects.equals(fileExtension, "jpg") && !Objects.equals(fileExtension, "png"))
             throw new ApiException(ExceptionEnum.UNSUPPORTED_IMAGE_FORMAT);
 
-        String fileFullName = this.fileService.FileUpload(authorization, file);
-        Account account = accountRepository.findByIdx(accessToken.getClaim("idx").asLong());
-        account.UploadProfilePicture(fileFullName);
-
-        return new ResponseEntity<>(new SuccessResponse<>(FileService.getFileUri(fileFullName)), HttpStatus.OK);
+        Account account = accountRepository.findByIdxAndIsActivateTrue(accessToken.getClaim("idx").asLong());
+        String fileName = this.uploadService.SaveFile(file);
+        account.ProfileImage(fileName);
+        return new ResponseEntity<>(new SuccessResponse<>(UploadService.getFileUri(fileName)), HttpStatus.OK);
     }
 }

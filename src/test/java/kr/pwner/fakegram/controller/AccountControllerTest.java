@@ -10,7 +10,7 @@ import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
 import kr.pwner.fakegram.service.AccountService;
-import kr.pwner.fakegram.service.FileService;
+import kr.pwner.fakegram.service.UploadService;
 import kr.pwner.fakegram.service.FollowService;
 import kr.pwner.fakegram.service.JwtService;
 import org.junit.jupiter.api.Test;
@@ -103,7 +103,7 @@ public class AccountControllerTest {
                 .setId(TESTER_ID)
                 .setName(TESTER_NAME)
                 .setEmail(TESTER_EMAIL)
-                .setProfilePicture(FileService.getFileUri(account.getProfilePicture()))
+                .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
                 .setFollower(follower)
                 .setFollowing(following);
 
@@ -145,7 +145,7 @@ public class AccountControllerTest {
 
     @Transactional
     @Test
-    public void UploadProfilePicture() throws Exception {
+    public void UploadProfileImage() throws Exception {
         CreateTemporaryAccount(TESTER_ID);
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -153,11 +153,10 @@ public class AccountControllerTest {
                 "image/png",
                 new FileInputStream("./src/test/java/kr/pwner/fakegram/image/image.jpg")
         );
-        mvc.perform(multipart("/api/v1/account/upload/profilePicture")
+        mvc.perform(multipart("/api/v1/account/upload/profileImage")
                 .file(file)
                 .header(HttpHeaders.AUTHORIZATION, jwtService.GenerateAccessToken(TESTER_ID))
         ).andExpect(status().isOk());
     }
-
 }
 

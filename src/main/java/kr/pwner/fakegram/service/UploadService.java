@@ -1,9 +1,8 @@
 package kr.pwner.fakegram.service;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
-import kr.pwner.fakegram.model.Upload;
+import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.UploadRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
@@ -19,58 +18,52 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
-public class FileService {
-    private final Path uploadLocation;
-    private final JwtService jwtService;
+public class UploadService {
     private final UploadRepository uploadRepository;
+    private final AccountRepository accountRepository;
+    private final Path uploadLocation;
 
-    public FileService(JwtService jwtService, UploadRepository uploadRepository) throws IOException {
-        this.jwtService = jwtService;
+    private final static String uploadPath = "/uploads";
+
+    public UploadService(
+            AccountRepository accountRepository,
+            UploadRepository uploadRepository
+    ) throws IOException {
+        this.accountRepository = accountRepository;
         this.uploadRepository = uploadRepository;
+        this.uploadLocation = Paths.get("."+uploadPath).toAbsolutePath().normalize();
 
-        this.uploadLocation = Paths.get("./uploads").toAbsolutePath().normalize();
         Files.createDirectories(this.uploadLocation);
     }
 
+    // * e.g. https://user-images.githubusercontent.com/40394063/182028559-6e115af2-e1c4-4fd3-afa0-b2e10501a66f.png
+    // * /postid/uuid.extension
     public static String getFileUri(String fileFullName) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
+                .path(uploadPath+"/")
                 .path(fileFullName)
                 .toUriString();
     }
 
-    public String FileUpload(
-            String authorization,
-            MultipartFile file
-    ) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
-                authorization.replace("Bearer ", "")
-        );
-        // Sanity check
+    public String SaveFile(MultipartFile file){
+        // * Sanity check
         if (file.isEmpty())
             throw new ApiException(ExceptionEnum.EMPTY_FILE);
-        // if deploy on production, you have to make more filter
+        // * if deploy on production, you have to make more filter
         if (StringUtils.cleanPath(file.getOriginalFilename()).contains(".."))
             throw new ApiException(ExceptionEnum.INVALID_FILE_NAME);
 
-        //  for security, don't use user's  filename
-        String fileFullName = UUID.randomUUID().toString() + "." +
+        // * for security and identify the file
+        String fileName = UUID.randomUUID().toString() + "." +
                 FilenameUtils.getExtension(file.getOriginalFilename());
+        Path filePath = this.uploadLocation.resolve(fileName);
 
-        Path fileLocation = this.uploadLocation.resolve(fileFullName);
-
+        // * Save given file - don't have any attribute
         try {
-            Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             throw new ApiException(ExceptionEnum.COULD_NOT_SAVE_THE_FILE);
         }
-        // save file attribute to db
-        Upload upload = Upload.builder()
-                .accountIdx(accessToken.getClaim("idx").asLong())
-                .fileFullName(fileFullName)
-                .build();
-        uploadRepository.save(upload);
-        return fileFullName;
+        return fileName;
     }
 }
