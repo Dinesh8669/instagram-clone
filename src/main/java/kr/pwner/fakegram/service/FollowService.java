@@ -43,16 +43,16 @@ public class FollowService {
                 authorization.replace("Bearer ", "")
         );
         // The access token will be verified on the interceptor
-        Long sourceIdx = accessToken.getClaim("idx").asLong();
-        Long targetIdx = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(request.getTargetId()))
+        Long fromIdx = accessToken.getClaim("idx").asLong();
+        Long toIdx = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(request.getTargetId()))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS)).getIdx();
 
-        Follow followHistory = followRepository.findBySourceIdxAndTargetIdx(sourceIdx, targetIdx);
+        Follow followHistory = followRepository.findByFromIdxAndToIdx(fromIdx, toIdx);
 
         if (Objects.isNull(followHistory)) { // do follow
             Follow follow = Follow.builder()
-                    .sourceIdx(sourceIdx)
-                    .targetIdx(targetIdx)
+                    .fromIdx(fromIdx)
+                    .toIdx(toIdx)
                     .build();
             followRepository.save(follow);
         } else { // unfollow

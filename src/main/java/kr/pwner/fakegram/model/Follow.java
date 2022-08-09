@@ -2,9 +2,11 @@ package kr.pwner.fakegram.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NoArgsConstructor
 @Getter
 @Entity
 public class Follow {
@@ -14,15 +16,14 @@ public class Follow {
     private Long idx;
 
     @Column(nullable = false)
-    private Long sourceIdx;
+    private Long fromIdx;
 
     @Column(nullable = false)
-    private Long targetIdx;
+    private Long toIdx;
 
-    public Follow() {}
     @Builder
-    public Follow(Long sourceIdx, Long targetIdx) {
-        this.sourceIdx = sourceIdx;
-        this.targetIdx = targetIdx;
+    public Follow(Long fromIdx, Long toIdx) {
+        this.fromIdx = fromIdx;
+        this.toIdx = toIdx;
     }
 }

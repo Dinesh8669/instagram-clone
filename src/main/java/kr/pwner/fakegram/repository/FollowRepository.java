@@ -11,17 +11,17 @@ import java.util.Map;
 
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Long> {
-    Follow findBySourceIdxAndTargetIdx(Long sourceIdx, Long targetIdx);
+    Follow findByFromIdxAndToIdx(Long fromIdx, Long toIdx);
 
     void deleteByIdx(Long idx);
 
-    @Query(value="SELECT ta.id, ta.name, ta.email " +
-            "FROM account ta, follow tf " +
-            "WHERE tf.source_idx = ta.idx AND tf.target_idx = :idx", nativeQuery = true)
+    @Query(value="SELECT a.id, a.name, a.email " +
+            "FROM account a, follow f " +
+            "f.toIdx = a.idx AND f.fromIdx = :idx", nativeQuery = true)
     List<Map<String, String>> getFollowerByIdx(@Param("idx") Long idx);
 
     @Query(value="SELECT ta.id, ta.name, ta.email " +
             "FROM account ta, follow tf " +
-            "WHERE tf.target_idx = ta.idx AND tf.source_idx = :idx", nativeQuery = true)
+            "f.fromIdx = a.idx AND f.toIdx = :idx", nativeQuery = true)
     List<Map<String, String>> getFollowingByIdx(@Param("idx") Long idx);
 }
