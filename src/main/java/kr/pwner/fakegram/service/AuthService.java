@@ -2,20 +2,16 @@ package kr.pwner.fakegram.service;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.auth.RefreshDto;
 import kr.pwner.fakegram.dto.auth.SignInDto;
 import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.lang.model.type.NullType;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,22 +39,18 @@ public class AuthService {
         return account;
     }
 
-    public ResponseEntity<SuccessResponse<SignInDto.Response>> SignIn(
-            final SignInDto.Request request
-    ) {
+    public SignInDto.Response SignIn(final SignInDto.Request request) {
         Account account = ValidateAccount(request.getId(), request.getPassword());
         SignInDto.Response response = new SignInDto.Response();
         response.setAccessTokenExpiresIn(String.valueOf(jwtService.getAccessTokenExpiresIn() / 1000))
                 .setRefreshTokenExpiresIn(String.valueOf(jwtService.getRefreshTokenExpiresIn() / 1000))
                 .setAccessToken(jwtService.GenerateAccessToken(account.getId()))
                 .setRefreshToken(jwtService.GenerateRefreshToken(account.getId()));
-        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
+        return response;
     }
 
     // need refactor
-    public ResponseEntity<SuccessResponse<RefreshDto.Response>> Refresh(
-            final RefreshDto.Request request
-    ) {
+    public RefreshDto.Response Refresh(final RefreshDto.Request request) {
         DecodedJWT refreshToken;
         try {
             //  It's not validated on the interceptor because refreshToken is passed via body
@@ -79,16 +71,12 @@ public class AuthService {
         if (!Objects.equals(dbRefreshToken, RequestRefreshToken))
             throw new ApiException(ExceptionEnum.INVALID_OR_EXPIRED_TOKEN);
 
-        RefreshDto.Response response = new RefreshDto.Response().setAccessToken(
-                jwtService.GenerateAccessToken(account.getId())
-        );
-        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
+        String accessToken = jwtService.GenerateAccessToken(account.getId());
+        return new RefreshDto.Response().setAccessToken(accessToken);
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<NullType>> SignOut(
-            String authorization
-    ) {
+    public void SignOut(String authorization) {
         DecodedJWT accessToken = jwtService.VerifyJwt(
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
@@ -98,6 +86,5 @@ public class AuthService {
         Optional.ofNullable(account.getRefreshToken())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ALREADY_SIGN_OUT));
         account.SignOut();
-        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

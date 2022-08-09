@@ -5,6 +5,8 @@ import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
 import kr.pwner.fakegram.service.AccountService;
+import kr.pwner.fakegram.service.UploadService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,14 +27,17 @@ public class AccountController {
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
             @Valid @RequestBody final CreateAccountDto.Request request
     ) {
-        return accountService.CreateAccount(request);
+        accountService.CreateAccount(request);
+        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/{id:^[a-zA-Z0-9]+}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<SuccessResponse<ReadAccountDto.Response>> ReadAccount(
             @Valid @PathVariable final String id
     ) {
-        return accountService.ReadAccount(id);
+        ReadAccountDto.Response response = accountService.ReadAccount(id);
+        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PUT, produces = "application/json")
@@ -40,14 +45,17 @@ public class AccountController {
             @RequestHeader(name = "Authorization") final String authorization,
             @Valid @RequestBody final UpdateAccountDto.Request request
     ) {
-        return accountService.UpdateAccount(authorization, request);
+        accountService.UpdateAccount(authorization, request);
+        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
+
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<SuccessResponse<NullType>> DeleteAccount(
             @RequestHeader(name = "Authorization") final String authorization
     ) {
-        return accountService.DeleteAccount(authorization);
+        accountService.DeleteAccount(authorization);
+        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/upload/profileImage", method = RequestMethod.POST, produces = "application/json")
@@ -55,6 +63,7 @@ public class AccountController {
             @RequestHeader(name = "Authorization") String authorization,
             @RequestParam("file") MultipartFile file
     ) {
-        return accountService.UploadProfileImage(authorization, file);
+        String fileName= accountService.UploadProfileImage(authorization, file);
+        return new ResponseEntity<>(new SuccessResponse<>(UploadService.getFileUri(fileName)), HttpStatus.OK);
     }
 }

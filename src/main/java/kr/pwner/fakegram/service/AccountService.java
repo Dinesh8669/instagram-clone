@@ -1,7 +1,6 @@
 package kr.pwner.fakegram.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
@@ -11,14 +10,11 @@ import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.lang.model.type.NullType;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,9 +42,7 @@ public class AccountService {
         this.uploadService = uploadService;
     }
 
-    public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
-            final CreateAccountDto.Request signUpDto
-    ) {
+    public void CreateAccount(final CreateAccountDto.Request signUpDto) {
         if (Objects.nonNull(accountRepository.findById(signUpDto.getId())))
             throw new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS);
 
@@ -59,13 +53,9 @@ public class AccountService {
                 .email(signUpDto.getEmail())
                 .build();
         accountRepository.save(account);
-
-        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
-    public ResponseEntity<SuccessResponse<ReadAccountDto.Response>> ReadAccount(
-            final String id
-    ) {
+    public ReadAccountDto.Response ReadAccount(final String id) {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
@@ -80,15 +70,11 @@ public class AccountService {
                 .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
                 .setFollower(follower)
                 .setFollowing(following);
-
-        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
+        return response;
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<NullType>> UpdateAccount(
-            final String authorization,
-            final UpdateAccountDto.Request request
-    ) {
+    public void UpdateAccount(final String authorization, final UpdateAccountDto.Request request) {
         DecodedJWT accessToken = jwtService.VerifyJwt(
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
@@ -104,16 +90,12 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.Update(request);
-
-        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
 
     // ToDo: If the account is deleted, delete related follow list
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<NullType>> DeleteAccount(
-            final String authorization
-    ) {
+    public void DeleteAccount(final String authorization) {
         DecodedJWT accessToken = jwtService.VerifyJwt(
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
@@ -123,15 +105,10 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.Delete();
-
-        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseEntity<SuccessResponse<String>> UploadProfileImage(
-            final String authorization,
-            final MultipartFile file
-    ){
+    public String UploadProfileImage(final String authorization, final MultipartFile file){
         DecodedJWT accessToken = jwtService.VerifyJwt(
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
@@ -145,6 +122,6 @@ public class AccountService {
         Account account = accountRepository.findByIdxAndIsActivateTrue(accessToken.getClaim("idx").asLong());
         String fileName = this.uploadService.SaveFile(file);
         account.ProfileImage(fileName);
-        return new ResponseEntity<>(new SuccessResponse<>(UploadService.getFileUri(fileName)), HttpStatus.OK);
+        return UploadService.getFileUri(fileName);
     }
 }

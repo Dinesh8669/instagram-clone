@@ -4,6 +4,7 @@ import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.auth.RefreshDto;
 import kr.pwner.fakegram.dto.auth.SignInDto;
 import kr.pwner.fakegram.service.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,20 +24,23 @@ public class AuthController {
     public ResponseEntity<SuccessResponse<SignInDto.Response>> SignIn(
             @Valid @RequestBody final SignInDto.Request request
     ) {
-        return authService.SignIn(request);
+        SignInDto.Response response = authService.SignIn(request);
+        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<SuccessResponse<RefreshDto.Response>> Refresh(
             @Valid @RequestBody final RefreshDto.Request request
     ) {
-        return authService.Refresh(request);
+        RefreshDto.Response response = authService.Refresh(request);
+        return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<SuccessResponse<NullType>> SignOut(
             @RequestHeader(name = "Authorization") final String authorization
     ) {
-        return authService.SignOut(authorization);
+        authService.SignOut(authorization);
+        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

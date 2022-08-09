@@ -1,19 +1,15 @@
 package kr.pwner.fakegram.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.follow.FollowDto;
 import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Follow;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.lang.model.type.NullType;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,10 +30,7 @@ public class FollowService {
     }
 
     @Transactional
-    public ResponseEntity<SuccessResponse<NullType>> Follow(
-            String authorization,
-            FollowDto.Request request
-    ) {
+    public void Follow(String authorization, FollowDto.Request request) {
         DecodedJWT accessToken = jwtService.VerifyJwt(
                 jwtService.getAccessTokenSecret(),
                 authorization.replace("Bearer ", "")
@@ -58,8 +51,5 @@ public class FollowService {
         } else { // unfollow
             followRepository.deleteByIdx(followHistory.getIdx());
         }
-        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
-
-
 }
