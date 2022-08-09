@@ -5,8 +5,7 @@
 # Features
 
 - [x] Account CRUD
-- [x] Auth - 
-- [x] Show user profiles(id, name, email, follower and following)
+- [x] Auth - Sign-in, Refresh, Sign-out
 - [x] Follow, Unfollow
 - [x] File upload (Profile picture)
 - [ ] Feed Upload
