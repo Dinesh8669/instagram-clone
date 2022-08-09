@@ -10,7 +10,6 @@ import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
-import kr.pwner.fakegram.repository.UploadRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,22 +31,19 @@ public class AccountService {
     private final JwtService jwtService;
     private final FollowRepository followRepository;
     private final UploadService uploadService;
-    private final UploadRepository uploadRepository;
 
     public AccountService(
             AccountRepository accountRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtService jwtService,
             FollowRepository followRepository,
-            UploadService uploadService,
-            UploadRepository uploadRepository
+            UploadService uploadService
     ) {
         this.accountRepository = accountRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtService = jwtService;
         this.followRepository = followRepository;
         this.uploadService = uploadService;
-        this.uploadRepository = uploadRepository;
     }
 
     public ResponseEntity<SuccessResponse<NullType>> CreateAccount(
