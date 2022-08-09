@@ -7,7 +7,7 @@
 - [x] Account CRUD
 - [x] Auth - Sign-in, Refresh, Sign-out
 - [x] Follow, Unfollow
-- [x] File upload (Profile picture)
+- [x] File upload - Profile picture
 - [ ] Feed Upload
 - [ ] Comment
 - [ ] Social sign-in
