@@ -4,7 +4,8 @@
 
 # Features
 
-- [x] Account(Sign-in, Sign-out, Update account, Delete account)
+- [x] Account CRUD
+- [x] Auth - 
 - [x] Show user profiles(id, name, email, follower and following)
 - [x] Follow, Unfollow
 - [x] File upload (Profile picture)
