@@ -73,9 +73,9 @@ public class Account {
     }
 
     public void Update(UpdateAccountDto.Request account) {
-        String encryptedPassword = new BCryptPasswordEncoder().encode(account.getPassword());
         this.id = Objects.nonNull(account.getId()) ? account.getId() : this.getId();
-        this.password = Objects.nonNull(account.getPassword()) ? encryptedPassword : this.getPassword();
+        this.password = Objects.nonNull(account.getPassword()) ?
+                new BCryptPasswordEncoder().encode(account.getPassword()) : this.getPassword();
         this.email = Objects.nonNull(account.getEmail()) ? account.getEmail() : this.getEmail();
         this.name = Objects.nonNull(account.getName()) ? account.getName() : this.getName();
         this.updatedAt = new Date();
