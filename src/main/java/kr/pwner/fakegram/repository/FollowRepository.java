@@ -18,12 +18,12 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query(value="SELECT a.id, a.name, a.email " +
             "FROM account a " +
             "INNER JOIN follow f " +
-            "ON f.to_idx = a.idx AND f.from_idx = :idx", nativeQuery = true)
+            "ON f.from_idx = a.idx AND f.to_idx = :idx", nativeQuery = true)
     List<Map<String, String>> getFollowerByIdx(@Param("idx") Long idx);
 
     @Query(value="SELECT a.id, a.name, a.email " +
             "FROM account a " +
             "INNER JOIN follow f " +
-            "ON f.from_idx = a.idx AND f.to_idx = :idx", nativeQuery = true)
+            "ON f.to_idx = a.idx AND f.from_idx = :idx", nativeQuery = true)
     List<Map<String, String>> getFollowingByIdx(@Param("idx") Long idx);
 }
