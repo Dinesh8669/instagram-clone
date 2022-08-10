@@ -31,8 +31,7 @@ public class FollowService {
 
     @Transactional
     public void Follow(String authorization, FollowDto.Request request) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        DecodedJWT accessToken = jwtService.VerifyAccessToken(
                 authorization.replace("Bearer ", "")
         );
         // The access token will be verified on the interceptor

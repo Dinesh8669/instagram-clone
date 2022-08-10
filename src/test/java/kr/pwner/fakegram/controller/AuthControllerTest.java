@@ -21,11 +21,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.lang.model.type.NullType;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -80,10 +77,8 @@ public class AuthControllerTest {
                 response, new TypeReference<>() {
                 });
 
-        DecodedJWT decodedJWT = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
-                successResponse.getData().getAccessToken()
-        );
+        DecodedJWT decodedJWT = jwtService.VerifyAccessToken(successResponse.getData().getAccessToken());
+
         assertEquals(
                 decodedJWT.getClaim("idx").asLong(),
                 accountRepository.findById(TESTER_ID).getIdx()
@@ -101,16 +96,11 @@ public class AuthControllerTest {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         SuccessResponse<RefreshDto.Response> successResponse = objectMapper.readValue(
-                response,
-                new TypeReference<>() {
-                }
-        );
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
-                successResponse.getData().getAccessToken()
-        );
+                response, new TypeReference<>() {
+                });
+        DecodedJWT decodedJWT = jwtService.VerifyAccessToken(successResponse.getData().getAccessToken());
 
-        Long idx = accessToken.getClaim("idx").asLong();
+        Long idx = decodedJWT.getClaim("idx").asLong();
         Account account = accountRepository.findByIdxAndIsActivateTrue(idx);
 
         assertEquals(idx, account.getIdx());
@@ -123,7 +113,6 @@ public class AuthControllerTest {
         mvc.perform(delete(BASE_URL)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
+                .andExpect(status().isOk());
     }
 }

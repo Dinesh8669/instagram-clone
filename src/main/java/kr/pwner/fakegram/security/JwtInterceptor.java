@@ -60,10 +60,13 @@ public class JwtInterceptor implements HandlerInterceptor, Cloneable {
         if (excludeMethodList.contains(request.getMethod()))
             return true;
         try {
-            String authorization = request.getHeader("Authorization").replace("Bearer ", "");
-            DecodedJWT token = jwtService.VerifyJwt(jwtService.getAccessTokenSecret(), authorization);
+            String authorization = request.getHeader("Authorization");
+
+            DecodedJWT decodedJWT = jwtService.VerifyAccessToken(
+                    authorization.replace("Bearer ", "")
+            );
             Account account = accountRepository.findByIdxAndIsActivateTrue(
-                    token.getClaim("idx").asLong()
+                    decodedJWT.getClaim("idx").asLong()
             );
             if (Objects.isNull(account))
                 throw new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS);

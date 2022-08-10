@@ -75,8 +75,7 @@ public class AccountService {
 
     @Transactional(rollbackFor = {Exception.class})
     public void UpdateAccount(final String authorization, final UpdateAccountDto.Request request) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        DecodedJWT accessToken = jwtService.VerifyAccessToken(
                 authorization.replace("Bearer ", "")
         );
 
@@ -96,8 +95,7 @@ public class AccountService {
     // ToDo: If the account is deleted, delete related follow list
     @Transactional(rollbackFor = {Exception.class})
     public void DeleteAccount(final String authorization) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        DecodedJWT accessToken = jwtService.VerifyAccessToken(
                 authorization.replace("Bearer ", "")
         );
 
@@ -109,8 +107,7 @@ public class AccountService {
 
     @Transactional(rollbackFor = {Exception.class})
     public String UploadProfileImage(final String authorization, final MultipartFile file){
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        DecodedJWT accessToken = jwtService.VerifyAccessToken(
                 authorization.replace("Bearer ", "")
         );
 

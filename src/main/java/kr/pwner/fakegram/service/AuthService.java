@@ -54,9 +54,8 @@ public class AuthService {
         DecodedJWT refreshToken;
         try {
             //  It's not validated on the interceptor because refreshToken is passed via body
-            refreshToken = jwtService.VerifyJwt(
-                    jwtService.getRefreshTokenSecret(),
-                    request.getRefreshToken()
+            refreshToken = jwtService.VerifyRefreshToken(
+                    request.getRefreshToken().replace("Bearer ", "")
             );
         } catch (NullPointerException | JWTDecodeException e) {
             throw new ApiException(ExceptionEnum.INVALID_OR_EXPIRED_TOKEN);
@@ -77,8 +76,7 @@ public class AuthService {
 
     @Transactional(rollbackFor = {Exception.class})
     public void SignOut(String authorization) {
-        DecodedJWT accessToken = jwtService.VerifyJwt(
-                jwtService.getAccessTokenSecret(),
+        DecodedJWT accessToken = jwtService.VerifyAccessToken(
                 authorization.replace("Bearer ", "")
         );
         Long idx = accessToken.getClaim("idx").asLong();
