@@ -25,7 +25,7 @@ public class Account {
     @Column(unique = true, nullable = false)
     private String id;
 
-    @Column(nullable = false, length = 72)
+    @Column(length = 72)
     private String password;
 
     @Column(nullable = false)

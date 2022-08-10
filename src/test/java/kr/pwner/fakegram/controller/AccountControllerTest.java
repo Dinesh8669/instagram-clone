@@ -1,7 +1,6 @@
 package kr.pwner.fakegram.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
@@ -10,9 +9,11 @@ import kr.pwner.fakegram.model.Account;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FollowRepository;
 import kr.pwner.fakegram.service.AccountService;
-import kr.pwner.fakegram.service.UploadService;
 import kr.pwner.fakegram.service.FollowService;
 import kr.pwner.fakegram.service.JwtService;
+import kr.pwner.fakegram.service.UploadService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,18 +21,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.lang.model.type.NullType;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+//@WebMvcTest(AccountController.class) - use for unit test
 @AutoConfigureMockMvc
 @SpringBootTest
 public class AccountControllerTest {
@@ -50,112 +49,116 @@ public class AccountControllerTest {
     @Autowired
     private FollowRepository followRepository;
 
-    private final String TESTER_ID = "TeSteR";
-    private final String OTHER_ID = "other";
+    private final String BASE_URL = "/api/v1/account";
+
+    private final String TESTER_ID_0 = "TeSteR";
+    private final String TESTER_ID_1 = TESTER_ID_0 + "shit";
+
     private final String TESTER_PW = "password123";
     private final String TESTER_EMAIL = "testtest@test.com";
     private final String TESTER_NAME = "tester!";
 
+    private String TESTER_0_ACCESS_TOKEN;
 
-    private void CreateTemporaryAccount(String id) {
+    @BeforeEach
+    public void init() {
         CreateAccountDto.Request request = new CreateAccountDto.Request()
-                .setId(id)
+                .setId(TESTER_ID_0)
                 .setPassword(TESTER_PW)
                 .setEmail(TESTER_EMAIL)
                 .setName(TESTER_NAME);
         accountService.CreateAccount(request);
+
+        request.setId(TESTER_ID_1);
+        accountService.CreateAccount(request);
+
+        TESTER_0_ACCESS_TOKEN = jwtService.GenerateAccessToken(TESTER_ID_0);
     }
 
-    @Transactional
+    @AfterEach
+    public void done() {
+        accountRepository.deleteById(TESTER_ID_0);
+        accountRepository.deleteById(TESTER_ID_1);
+    }
+
     @Test
     public void CreateAccount() throws Exception {
         CreateAccountDto.Request request = new CreateAccountDto.Request()
-                .setId(TESTER_ID)
+                .setId(TESTER_ID_0 + "123")
                 .setPassword(TESTER_PW)
                 .setEmail(TESTER_EMAIL)
                 .setName(TESTER_NAME);
-        mvc.perform(post("/api/v1/account")
+
+        mvc.perform(post(BASE_URL)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
+                .andExpect(status().isOk());
+
+        accountRepository.deleteById(TESTER_ID_0 + "123");
     }
 
-    @Transactional
     @Test
     public void ReadAccount() throws Exception {
-        CreateTemporaryAccount(TESTER_ID);
-        CreateTemporaryAccount(OTHER_ID);
 
-        FollowDto.Request followDto = new FollowDto.Request().setTargetId(TESTER_ID);
-        followService.Follow(jwtService.GenerateAccessToken(OTHER_ID), followDto);
-
+        FollowDto.Request followDto = new FollowDto.Request().setTargetId(TESTER_ID_0);
+        followService.Follow(jwtService.GenerateAccessToken(TESTER_ID_1), followDto);
         List<Map<String, String>> follower = followRepository.getFollowerByIdx(
-                accountRepository.findById(TESTER_ID).getIdx()
+                accountRepository.findById(TESTER_ID_0).getIdx()
         );
         List<Map<String, String>> following = followRepository.getFollowingByIdx(
-                accountRepository.findById(TESTER_ID).getIdx()
+                accountRepository.findById(TESTER_ID_0).getIdx()
         );
 
-        Account account = accountRepository.findById(TESTER_ID);
-
+        Account account = accountRepository.findById(TESTER_ID_0);
         ReadAccountDto.Response response = new ReadAccountDto.Response()
-                .setId(TESTER_ID)
+                .setId(TESTER_ID_0)
                 .setName(TESTER_NAME)
                 .setEmail(TESTER_EMAIL)
                 .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
                 .setFollower(follower)
                 .setFollowing(following);
 
-        mvc.perform(get("/api/v1/account/" + TESTER_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new SuccessResponse<>(response)
-                )));
+        mvc.perform(get(BASE_URL + "/" + TESTER_ID_0))
+                .andExpect(status().isOk());
     }
 
-    @Transactional
     @Test
     public void UpdateAccount() throws Exception {
-        CreateTemporaryAccount(TESTER_ID);
         UpdateAccountDto.Request request = new UpdateAccountDto.Request()
-                .setId(TESTER_ID + "123")
+                .setId(TESTER_ID_0 + "123")
                 .setPassword(TESTER_PW + "123")
                 .setEmail("asd" + TESTER_EMAIL)
                 .setName(TESTER_NAME + "123");
 
-        mvc.perform(put("/api/v1/account")
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.GenerateAccessToken(TESTER_ID))
+        mvc.perform(put(BASE_URL)
+                        .header(HttpHeaders.AUTHORIZATION, TESTER_0_ACCESS_TOKEN)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
+                .andExpect(status().isOk());
+
+        accountRepository.deleteById(TESTER_ID_0 + "123");
     }
 
-    @Transactional
     @Test
     public void DeleteAccount() throws Exception {
-        CreateTemporaryAccount(TESTER_ID);
-        mvc.perform(delete("/api/v1/account")
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.GenerateAccessToken(TESTER_ID))
+        mvc.perform(delete(BASE_URL)
+                        .header(HttpHeaders.AUTHORIZATION, TESTER_0_ACCESS_TOKEN)
                         .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(new SuccessResponse<NullType>())));
+                .andExpect(status().isOk());
     }
 
-    @Transactional
     @Test
     public void UploadProfileImage() throws Exception {
-        CreateTemporaryAccount(TESTER_ID);
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "shit.jpg",
                 "image/png",
                 new FileInputStream("./src/test/java/kr/pwner/fakegram/image/image.jpg")
         );
-        mvc.perform(multipart("/api/v1/account/upload/profileImage")
-                .file(file)
-                .header(HttpHeaders.AUTHORIZATION, jwtService.GenerateAccessToken(TESTER_ID))
-        ).andExpect(status().isOk());
+
+        mvc.perform(multipart(BASE_URL + "/upload/profileImage")
+                        .file(file)
+                        .header(HttpHeaders.AUTHORIZATION, TESTER_0_ACCESS_TOKEN))
+                .andExpect(status().isOk());
     }
 }
