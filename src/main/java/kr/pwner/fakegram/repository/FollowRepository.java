@@ -16,12 +16,14 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     void deleteByIdx(Long idx);
 
     @Query(value="SELECT a.id, a.name, a.email " +
-            "FROM account a, follow f " +
-            "f.toIdx = a.idx AND f.fromIdx = :idx", nativeQuery = true)
+            "FROM account a " +
+            "INNER JOIN follow f " +
+            "ON f.to_idx = a.idx AND f.from_idx = :idx", nativeQuery = true)
     List<Map<String, String>> getFollowerByIdx(@Param("idx") Long idx);
 
-    @Query(value="SELECT ta.id, ta.name, ta.email " +
-            "FROM account ta, follow tf " +
-            "f.fromIdx = a.idx AND f.toIdx = :idx", nativeQuery = true)
+    @Query(value="SELECT a.id, a.name, a.email " +
+            "FROM account a " +
+            "INNER JOIN follow f " +
+            "ON f.from_idx = a.idx AND f.to_idx = :idx", nativeQuery = true)
     List<Map<String, String>> getFollowingByIdx(@Param("idx") Long idx);
 }
