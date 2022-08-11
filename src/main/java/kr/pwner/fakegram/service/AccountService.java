@@ -62,14 +62,13 @@ public class AccountService {
         List<Map<String, String>> follower = followRepository.getFollowerByIdx(account.getIdx());
         List<Map<String, String>> following = followRepository.getFollowingByIdx(account.getIdx());
 
-        ReadAccountDto.Response response = new ReadAccountDto.Response()
+        return new ReadAccountDto.Response()
                 .setId(account.getId())
                 .setName(account.getName())
                 .setEmail(account.getEmail())
                 .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
                 .setFollower(follower)
                 .setFollowing(following);
-        return response;
     }
 
     @Transactional(rollbackFor = {Exception.class})
