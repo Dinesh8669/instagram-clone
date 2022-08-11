@@ -89,8 +89,6 @@ public class AccountService {
         account.Update(request);
     }
 
-
-    // ToDo: If the account is deleted, delete related follow list
     @Transactional(rollbackFor = {Exception.class})
     public void DeleteAccount(final String authorization) {
         DecodedJWT accessToken = jwtService.VerifyAccessToken(
