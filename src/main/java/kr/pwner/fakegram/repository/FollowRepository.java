@@ -7,15 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     Follow findByFromIdxAndToIdx(Long fromIdx, Long toIdx);
-
     void deleteByIdx(Long idx);
 
+    @Transactional
     @Modifying
     @Query(value = "DELETE FROM follow f " +
             "WHERE f.from_idx = :idx OR f.to_idx = :idx", nativeQuery = true)

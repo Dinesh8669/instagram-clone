@@ -1,11 +1,13 @@
 package kr.pwner.fakegram.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.follow.FollowDto;
+import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.service.AccountService;
 import kr.pwner.fakegram.service.JwtService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,61 +15,62 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 public class FollowControllerTest {
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
     @Autowired
-    JwtService jwtService;
+    private AccountRepository accountRepository;
     @Autowired
-    MockMvc mvc;
+    private JwtService jwtService;
     @Autowired
-    ObjectMapper objectMapper;
+    private MockMvc mvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    private final String TARGET_ID = "IDIOT";
-    private final String TESTER_ID = "TeSteR";
+    private final String TESTER_ID_0 = "TeSteR";
+    private final String TESTER_ID_1 = TESTER_ID_0 + "shit";
     private final String TESTER_PW = "password123";
     private final String TESTER_EMAIL = "testtest@test.com";
     private final String TESTER_NAME = "tester!";
 
-    private void CreateTemporaryAccount(String id) {
+    @BeforeEach
+    public void init() {
         CreateAccountDto.Request request = new CreateAccountDto.Request()
-                .setId(id)
+                .setId(TESTER_ID_0)
                 .setPassword(TESTER_PW)
                 .setEmail(TESTER_EMAIL)
                 .setName(TESTER_NAME);
         accountService.CreateAccount(request);
+
+        request.setId(TESTER_ID_1);
+        accountService.CreateAccount(request);
+    }
+    @AfterEach
+    public void done(){
+        accountRepository.deleteById(TESTER_ID_0);
+        accountRepository.deleteById(TESTER_ID_1);
     }
 
-    @Transactional
     @Test
     public void Follow() throws Exception {
-        CreateTemporaryAccount(TESTER_ID);
-        CreateTemporaryAccount(TARGET_ID);
-        String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
-        FollowDto.Request request = new FollowDto.Request().setTargetId(TARGET_ID);
+        String accessToken = jwtService.GenerateAccessToken(TESTER_ID_0);
+        FollowDto.Request request = new FollowDto.Request().setTargetId(TESTER_ID_1);
         mvc.perform(post("/api/v1/follow") //follow
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new SuccessResponse<>()
-                )));
+                .andExpect(status().isOk());
+
         mvc.perform(post("/api/v1/follow") //unfollow
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new SuccessResponse<>()
-                )));
+                .andExpect(status().isOk());
     }
 }

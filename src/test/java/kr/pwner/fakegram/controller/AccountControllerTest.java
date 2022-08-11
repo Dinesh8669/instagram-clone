@@ -123,6 +123,7 @@ public class AccountControllerTest {
         mvc.perform(get(BASE_URL + "/" + TESTER_ID_0))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(successResponse)));
+        followRepository.deleteAllByIdx(accountIdx);
     }
 
     @Test

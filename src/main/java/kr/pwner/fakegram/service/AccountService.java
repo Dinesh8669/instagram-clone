@@ -41,6 +41,7 @@ public class AccountService {
         this.uploadService = uploadService;
     }
 
+    @Transactional
     public void CreateAccount(final CreateAccountDto.Request signUpDto) {
         if (Objects.nonNull(accountRepository.findById(signUpDto.getId())))
             throw new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS);
