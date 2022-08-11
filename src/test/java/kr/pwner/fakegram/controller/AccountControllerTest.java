@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -112,7 +111,6 @@ public class AccountControllerTest {
         follow.setFollower(followRepository.getFollowerByIdx(accountIdx));
         follow.setFollowing(followRepository.getFollowingByIdx(accountIdx));
 
-        Account account = accountRepository.findById(TESTER_ID_0);
         SuccessResponse<ReadAccountDto.Response> successResponse = new SuccessResponse<>(
                 new ReadAccountDto.Response()
                         .setId(TESTER_ID_0)
@@ -124,8 +122,7 @@ public class AccountControllerTest {
 
         mvc.perform(get(BASE_URL + "/" + TESTER_ID_0))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(successResponse)))
-                .andDo(print());
+                .andExpect(content().json(objectMapper.writeValueAsString(successResponse)));
     }
 
     @Test
