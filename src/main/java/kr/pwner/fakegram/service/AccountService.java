@@ -62,11 +62,14 @@ public class AccountService {
         follow.setFollower(followRepository.getFollowerByIdx(account.getIdx()));
         follow.setFollowing(followRepository.getFollowingByIdx(account.getIdx()));
 
+        String profileImage = Objects.isNull(account.getProfileImage()) ?
+                "" : UploadService.getFileUri(account.getProfileImage());
+
         return new ReadAccountDto.Response()
                 .setId(account.getId())
                 .setName(account.getName())
                 .setEmail(account.getEmail())
-                .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
+                .setProfilePicture(profileImage)
                 .setFollow(follow);
     }
 
