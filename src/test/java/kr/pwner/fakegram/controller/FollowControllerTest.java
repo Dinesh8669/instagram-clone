@@ -66,7 +66,7 @@ public class FollowControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
-
+        
         mvc.perform(post("/api/v1/follow") //unfollow
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)

@@ -31,6 +31,7 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
+    @Transactional(readOnly = true)
     private Account ValidateAccount(final String id, final String password) {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
@@ -49,6 +50,7 @@ public class AuthService {
         return response;
     }
 
+    @Transactional(readOnly = true)
     public RefreshDto.Response Refresh(final RefreshDto.Request request) {
         DecodedJWT refreshToken;
         try {
@@ -73,7 +75,7 @@ public class AuthService {
         return new RefreshDto.Response().setAccessToken(accessToken);
     }
 
-    @Transactional(rollbackFor = {Exception.class})
+    @Transactional
     public void SignOut(String authorization) {
         DecodedJWT accessToken = jwtService.VerifyAccessToken(
                 authorization.replace("Bearer ", "")

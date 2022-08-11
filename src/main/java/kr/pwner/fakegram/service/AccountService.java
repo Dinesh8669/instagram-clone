@@ -41,7 +41,6 @@ public class AccountService {
         this.uploadService = uploadService;
     }
 
-    @Transactional
     public void CreateAccount(final CreateAccountDto.Request signUpDto) {
         if (Objects.nonNull(accountRepository.findById(signUpDto.getId())))
             throw new ApiException(ExceptionEnum.ACCOUNT_ALREADY_EXISTS);
@@ -55,6 +54,7 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+    @Transactional(readOnly = true)
     public ReadAccountDto.Response ReadAccount(final String id) {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));

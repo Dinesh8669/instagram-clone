@@ -27,16 +27,12 @@ public class JwtService {
     private String refreshTokenSecret;
 
     // * 15 minutes
-    private final long accessTokenExpiresIn = 1000 * 60 * 15;
-    // * 1 day
-    private final long refreshTokenExpiresIn = 1000 * 60 * 60 * 24;
-
     public long getAccessTokenExpiresIn(){
-        return this.accessTokenExpiresIn + new Date().getTime();
+        return 1000 * 60 * 15 + new Date().getTime();
     }
-
+    // * 1 day
     public long getRefreshTokenExpiresIn(){
-        return this.refreshTokenExpiresIn + new Date().getTime();
+        return 1000 * 60 * 60 * 24 + new Date().getTime();
     }
 
     public DecodedJWT VerifyAccessToken(final String token) {
