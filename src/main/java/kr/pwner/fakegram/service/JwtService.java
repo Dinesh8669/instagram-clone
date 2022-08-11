@@ -20,7 +20,6 @@ public class JwtService {
         this.accountRepository = accountRepository;
     }
 
-    // * Todo: remove getter/setter and refactor
     @Value("${env.JWT_ACCESS_SECRET}")
     private String accessTokenSecret;
 
