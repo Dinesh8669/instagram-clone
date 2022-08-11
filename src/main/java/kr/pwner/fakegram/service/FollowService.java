@@ -39,6 +39,9 @@ public class FollowService {
         Long toIdx = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(request.getTargetId()))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS)).getIdx();
 
+        if (Objects.equals(fromIdx, toIdx))
+            throw new ApiException(ExceptionEnum.CANNOT_FOLLOW_YOURSELF);
+
         Follow followHistory = followRepository.findByFromIdxAndToIdx(fromIdx, toIdx);
 
         if (Objects.isNull(followHistory)) { // do follow

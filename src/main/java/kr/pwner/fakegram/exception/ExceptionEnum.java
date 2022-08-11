@@ -14,11 +14,13 @@ public enum ExceptionEnum {
     ALREADY_SIGN_OUT("005", "Already Sign Out", HttpStatus.NOT_FOUND),
     ACCESS_TOKEN_REQUIRED("006", "Access Token not Provided", HttpStatus.BAD_REQUEST),
 
-    INVALID_FILE_NAME("007", "Invalid file name", HttpStatus.NOT_ACCEPTABLE),
-    EMPTY_FILE("008", "File is empty", HttpStatus.NOT_ACCEPTABLE),
-    INVALID_MULTIPART_REQUEST("009", "Invalid multipart request", HttpStatus.BAD_REQUEST),
-    COULD_NOT_SAVE_THE_FILE("010", "Could not save the file", HttpStatus.INTERNAL_SERVER_ERROR),
-    UNSUPPORTED_IMAGE_FORMAT("012", "Unsupported image format(.jpg, .png)", HttpStatus.NOT_ACCEPTABLE),
+    INVALID_FILE_NAME("007", "Invalid File Name", HttpStatus.NOT_ACCEPTABLE),
+    EMPTY_FILE("008", "File is Empty", HttpStatus.NOT_ACCEPTABLE),
+    INVALID_MULTIPART_REQUEST("009", "Invalid Multipart Request", HttpStatus.BAD_REQUEST),
+    COULD_NOT_SAVE_THE_FILE("010", "Could not Save the File", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNSUPPORTED_IMAGE_FORMAT("011", "Unsupported Image Format(.jpg, .png)", HttpStatus.NOT_ACCEPTABLE),
+
+    CANNOT_FOLLOW_YOURSELF("012", "Cannot Follow Yourself", HttpStatus.BAD_REQUEST),
 
     // Request Validation
     INVALID_REQUEST_BODY("100", "Invalid Request Body",HttpStatus.BAD_REQUEST),
