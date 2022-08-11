@@ -54,7 +54,7 @@ public class UploadService {
             throw new ApiException(ExceptionEnum.INVALID_FILE_NAME);
 
         // * for security and identify the file
-        String fileName = UUID.randomUUID().toString() + "." +
+        String fileName = UUID.randomUUID() + "." +
                 FilenameUtils.getExtension(file.getOriginalFilename());
         Path filePath = this.uploadLocation.resolve(fileName);
 
