@@ -1,6 +1,7 @@
 package kr.pwner.fakegram.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
@@ -23,11 +24,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.FileInputStream;
-import java.util.List;
-import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 //@WebMvcTest(AccountController.class) - use for unit test
@@ -94,32 +95,35 @@ public class AccountControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
+        String accountId = accountRepository.findById(TESTER_ID_0 + "123").getId();
+        assertEquals(TESTER_ID_0 + "123", accountId);
+
         accountRepository.deleteById(TESTER_ID_0 + "123");
     }
 
     @Test
     public void ReadAccount() throws Exception {
-
         FollowDto.Request followDto = new FollowDto.Request().setTargetId(TESTER_ID_0);
         followService.Follow(jwtService.GenerateAccessToken(TESTER_ID_1), followDto);
-        List<Map<String, String>> follower = followRepository.getFollowerByIdx(
-                accountRepository.findById(TESTER_ID_0).getIdx()
-        );
-        List<Map<String, String>> following = followRepository.getFollowingByIdx(
-                accountRepository.findById(TESTER_ID_0).getIdx()
-        );
+
+        Long accountIdx = accountRepository.findById(TESTER_ID_0).getIdx();
+        FollowDto.Response follow = new FollowDto.Response();
+        follow.setFollower(followRepository.getFollowerByIdx(accountIdx));
+        follow.setFollowing(followRepository.getFollowingByIdx(accountIdx));
 
         Account account = accountRepository.findById(TESTER_ID_0);
-        ReadAccountDto.Response response = new ReadAccountDto.Response()
-                .setId(TESTER_ID_0)
-                .setName(TESTER_NAME)
-                .setEmail(TESTER_EMAIL)
-                .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
-                .setFollower(follower)
-                .setFollowing(following);
+        SuccessResponse<ReadAccountDto.Response> successResponse = new SuccessResponse<>(
+                new ReadAccountDto.Response()
+                        .setId(TESTER_ID_0)
+                        .setName(TESTER_NAME)
+                        .setEmail(TESTER_EMAIL)
+                        .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
+                        .setFollow(follow)
+        );
 
         mvc.perform(get(BASE_URL + "/" + TESTER_ID_0))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(successResponse)));
     }
 
     @Test
@@ -136,6 +140,11 @@ public class AccountControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
+        Account account = accountRepository.findById(TESTER_ID_0 + "123");
+        assertEquals(TESTER_ID_0 + "123", account.getId());
+        assertEquals("asd" + TESTER_EMAIL, account.getEmail());
+        assertEquals(TESTER_NAME + "123", account.getName());
+
         accountRepository.deleteById(TESTER_ID_0 + "123");
     }
 
@@ -145,6 +154,9 @@ public class AccountControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, TESTER_0_ACCESS_TOKEN)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
+        Account account = accountRepository.findById(TESTER_ID_0);
+
+        assertFalse(account.getIsActivate());
     }
 
     @Test

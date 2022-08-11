@@ -70,7 +70,8 @@ public class AuthControllerTest {
         String response = mvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         // * https://stackoverflow.com/questions/11664894/jackson-deserialize-using-generic-class
         SuccessResponse<SignInDto.Response> successResponse = objectMapper.readValue(
@@ -93,7 +94,8 @@ public class AuthControllerTest {
         String response = mvc.perform(put(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         SuccessResponse<RefreshDto.Response> successResponse = objectMapper.readValue(
                 response, new TypeReference<>() {

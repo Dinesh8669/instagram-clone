@@ -1,10 +1,8 @@
 package kr.pwner.fakegram.dto.account;
 
+import kr.pwner.fakegram.dto.follow.FollowDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.util.List;
-import java.util.Map;
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReadAccountDto {
@@ -15,7 +13,6 @@ public class ReadAccountDto {
         private String name;
         private String email;
         private String profilePicture;
-        private List<Map<String, String>> follower;
-        private List<Map<String, String>> following;
+        private FollowDto.Response follow;
     }
 }

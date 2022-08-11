@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.dto.account.ReadAccountDto;
 import kr.pwner.fakegram.dto.account.UpdateAccountDto;
+import kr.pwner.fakegram.dto.follow.FollowDto;
 import kr.pwner.fakegram.exception.ApiException;
 import kr.pwner.fakegram.exception.ExceptionEnum;
 import kr.pwner.fakegram.model.Account;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -59,16 +58,16 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findByIdAndIsActivateTrue(id))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
 
-        List<Map<String, String>> follower = followRepository.getFollowerByIdx(account.getIdx());
-        List<Map<String, String>> following = followRepository.getFollowingByIdx(account.getIdx());
+        FollowDto.Response follow = new FollowDto.Response();
+        follow.setFollower(followRepository.getFollowerByIdx(account.getIdx()));
+        follow.setFollowing(followRepository.getFollowingByIdx(account.getIdx()));
 
         return new ReadAccountDto.Response()
                 .setId(account.getId())
                 .setName(account.getName())
                 .setEmail(account.getEmail())
                 .setProfilePicture(UploadService.getFileUri(account.getProfileImage()))
-                .setFollower(follower)
-                .setFollowing(following);
+                .setFollow(follow);
     }
 
     @Transactional(rollbackFor = {Exception.class})
