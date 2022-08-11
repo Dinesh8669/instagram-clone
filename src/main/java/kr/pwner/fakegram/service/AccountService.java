@@ -101,6 +101,8 @@ public class AccountService {
         Account account = Optional.ofNullable(accountRepository.findByIdxAndIsActivateTrue(idx))
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ACCOUNT_NOT_EXISTS));
         account.Delete();
+        // ? Delete all related follow relationship
+        followRepository.deleteAllByIdx(account.getIdx());
     }
 
     @Transactional(rollbackFor = {Exception.class})
