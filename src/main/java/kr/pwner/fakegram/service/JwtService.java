@@ -26,8 +26,10 @@ public class JwtService {
     @Value("${env.JWT_REFRESH_SECRET}")
     private String refreshTokenSecret;
 
-    private final long accessTokenExpiresIn = 1000 * 60 * 15; // 15 minute
-    private final long refreshTokenExpiresIn = 1000 * 60 * 60 * 24; // 1 day
+    // * 15 minutes
+    private final long accessTokenExpiresIn = 1000 * 60 * 15;
+    // * 1 day
+    private final long refreshTokenExpiresIn = 1000 * 60 * 60 * 24;
 
     public long getAccessTokenExpiresIn(){
         return this.accessTokenExpiresIn + new Date().getTime();
@@ -48,7 +50,6 @@ public class JwtService {
                 .verify(token);
     }
 
-    //need to generate random access token
     public String GenerateAccessToken(final String id) {
         Account account = accountRepository.findByIdAndIsActivateTrue(id);
         return  JWT.create()

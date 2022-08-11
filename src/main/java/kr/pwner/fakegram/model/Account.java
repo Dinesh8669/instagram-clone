@@ -50,10 +50,8 @@ public class Account {
     private String refreshToken;
 
     private String profileImage;
-//    // * Relation Mapping
-//    @Setter
-//    @OneToOne(mappedBy = "Account", fetch = FetchType.EAGER)
-//    private Upload profilePicture;
+    // * Relation Mapping
+    // ? feed relation
 
     // * Methods
     @Builder

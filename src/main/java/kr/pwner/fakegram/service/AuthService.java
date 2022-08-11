@@ -49,11 +49,10 @@ public class AuthService {
         return response;
     }
 
-    // need refactor
     public RefreshDto.Response Refresh(final RefreshDto.Request request) {
         DecodedJWT refreshToken;
         try {
-            //  It's not validated on the interceptor because refreshToken is passed via body
+            // ? It's not validated on the interceptor because refreshToken is passed via body
             refreshToken = jwtService.VerifyRefreshToken(
                     request.getRefreshToken().replace("Bearer ", "")
             );

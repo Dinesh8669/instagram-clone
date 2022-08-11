@@ -72,7 +72,7 @@ public class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        // https://stackoverflow.com/questions/11664894/jackson-deserialize-using-generic-class
+        // * https://stackoverflow.com/questions/11664894/jackson-deserialize-using-generic-class
         SuccessResponse<SignInDto.Response> successResponse = objectMapper.readValue(
                 response, new TypeReference<>() {
                 });
@@ -108,7 +108,7 @@ public class AuthControllerTest {
 
     @Test
     public void SignOut() throws Exception {
-        String accessToken = jwtService.GenerateAccessToken(TESTER_ID); //for sign out
+        String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
         jwtService.GenerateRefreshToken(TESTER_ID); // for generate refresh token uuid
         mvc.perform(delete(BASE_URL)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)

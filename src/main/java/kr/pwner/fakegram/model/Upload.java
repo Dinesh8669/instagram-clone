@@ -16,13 +16,10 @@ public class Upload {
 
     @Column(nullable = false)
     private String fileName;
-//
-//    // * Relation Mapping
-//    @Setter
-//    @ManyToOne(cascade=CascadeType.ALL)
-//    @JoinColumn(name="ACCOUNT_IDX")
-//    private Account account;
-//
+
+    // * Relation Mapping
+    // ? feed relation
+
 //    // * Methods
 //    @Builder
 //    public Upload(Account account, String fileName){
