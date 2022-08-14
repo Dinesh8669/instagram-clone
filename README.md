@@ -8,7 +8,7 @@
 - [x] Auth - Sign-in, Refresh, Sign-out
 - [x] Follow, Unfollow
 - [x] File upload - Profile picture
-- [ ] Feed Upload
+- [ ] Feed Upload - Upload multiple image
 - [ ] Comment
 - [ ] Social sign-in
 
