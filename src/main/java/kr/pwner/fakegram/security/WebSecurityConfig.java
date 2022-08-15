@@ -36,6 +36,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         JwtInterceptor AccountUploadInterceptor = (JwtInterceptor) jwtInterceptor.clone();
         JwtInterceptor AuthInterceptor = (JwtInterceptor) jwtInterceptor.clone();
         JwtInterceptor FollowInterceptor = (JwtInterceptor) jwtInterceptor.clone();
+        JwtInterceptor FeedInterceptor = (JwtInterceptor) jwtInterceptor.clone();
 
         registry.addInterceptor(AccountInterceptor.setExcludeMethodList(Arrays.asList("GET", "POST")))
                 .order(0).addPathPatterns("/api/*/account");
@@ -43,6 +44,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         registry.addInterceptor(AuthInterceptor.setExcludeMethodList(Arrays.asList("POST", "PUT")))
                 .order(0).addPathPatterns("/api/*/auth");
         registry.addInterceptor(FollowInterceptor).order(0).addPathPatterns("/api/*/follow");
+        registry.addInterceptor(FeedInterceptor).order(0).addPathPatterns("/api/*/feed");
     }
 
     @Override
