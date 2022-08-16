@@ -4,7 +4,7 @@
 
 # Features
 
-- [x] Account CRUD
+- [x] Account CRUD - Look up the account, Sign-up, Update the account, Delete the account
 - [x] Auth - Sign-in, Refresh, Sign-out
 - [x] Follow, Unfollow
 - [x] File upload - Profile picture
