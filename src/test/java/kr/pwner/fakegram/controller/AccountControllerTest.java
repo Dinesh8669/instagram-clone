@@ -129,7 +129,7 @@ public class AccountControllerTest {
     @Test
     public void UpdateAccount() throws Exception {
         UpdateAccountDto.Request request = new UpdateAccountDto.Request()
-                .setId(TESTER_ID_0 + "123")
+                .setId(TESTER_ID_0 + "1234")
                 .setPassword(TESTER_PW + "123")
                 .setEmail("asd" + TESTER_EMAIL)
                 .setName(TESTER_NAME + "123");
@@ -140,12 +140,12 @@ public class AccountControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        Account account = accountRepository.findById(TESTER_ID_0 + "123");
-        assertEquals(TESTER_ID_0 + "123", account.getId());
+        Account account = accountRepository.findById(TESTER_ID_0 + "1234");
+        assertEquals(TESTER_ID_0 + "1234", account.getId());
         assertEquals("asd" + TESTER_EMAIL, account.getEmail());
         assertEquals(TESTER_NAME + "123", account.getName());
 
-        accountRepository.deleteById(TESTER_ID_0 + "123");
+        accountRepository.deleteById(TESTER_ID_0 + "1234");
     }
 
     @Test
