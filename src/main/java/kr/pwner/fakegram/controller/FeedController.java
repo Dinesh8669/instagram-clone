@@ -25,7 +25,7 @@ public class FeedController {
             @RequestHeader(name = "Authorization") final String authorization
 //            @RequestParam(name="files") MultipartFile[] files
     ) {
-        feedService.CreateFeed();
+        feedService.CreateFeed(authorization);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

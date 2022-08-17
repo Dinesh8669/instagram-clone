@@ -1,5 +1,6 @@
 package kr.pwner.fakegram.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,5 +18,17 @@ public class Feed {
     @Column(nullable = false)
     private String content;
 
-    //@ManyToOne(mapped="feed")
+    @ManyToOne
+    @JoinColumn(name = "ACCOUNT_IDX")
+    private Account account;
+
+    @Builder
+    public Feed(String content){
+        this.content = content;
+    }
+
+    public void LinkAccount(Account account){
+        account.getFeeds().add(this);
+        this.account = account;
+    }
 }

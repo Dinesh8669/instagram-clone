@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor
@@ -51,7 +53,8 @@ public class Account {
 
     private String profileImage;
     // * Relation Mapping
-    // ? feed relation
+    @OneToMany(mappedBy = "account")
+    private List<Feed> feeds = new ArrayList<>();
 
     // * Methods
     @Builder
@@ -60,7 +63,6 @@ public class Account {
         this.password = password;
         this.name = name;
         this.email = email;
-
 
         this.isActivate = true;
         this.role = AccountRole.USER;
