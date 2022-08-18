@@ -4,10 +4,8 @@ import kr.pwner.fakegram.dto.ApiResponse.SuccessResponse;
 import kr.pwner.fakegram.service.FeedService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
 
@@ -22,10 +20,11 @@ public class FeedController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<SuccessResponse<NullType>> CreateFeed(
-            @RequestHeader(name = "Authorization") final String authorization
-//            @RequestParam(name="files") MultipartFile[] files
+            @RequestHeader(name = "Authorization") final String authorization,
+            @RequestParam(name="files", required = false) MultipartFile[] files,
+            @RequestParam(name="content", required= false) String content
     ) {
-        feedService.CreateFeed(authorization);
-        return new ResponseEntity<>(HttpStatus.OK);
+        feedService.CreateFeed(authorization, files, content);
+        return new ResponseEntity<>(new SuccessResponse<>(), HttpStatus.OK);
     }
 }

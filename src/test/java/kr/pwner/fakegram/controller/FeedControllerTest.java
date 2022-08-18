@@ -2,6 +2,7 @@ package kr.pwner.fakegram.controller;
 
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
 import kr.pwner.fakegram.repository.AccountRepository;
+import kr.pwner.fakegram.repository.FeedRepository;
 import kr.pwner.fakegram.service.AccountService;
 import kr.pwner.fakegram.service.JwtService;
 import org.junit.jupiter.api.AfterEach;
@@ -22,13 +23,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class FeedControllerTest {
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
-    JwtService jwtService;
+    private JwtService jwtService;
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
+    @Autowired
+    private FeedRepository feedRepository;
 
     private final String BASE_URL = "/api/v1/feed";
 
@@ -48,7 +51,9 @@ public class FeedControllerTest {
     }
 
     @AfterEach
-    public void done() {
+    public void done(){
+        Long accountIdx = accountRepository.findById(TESTER_ID).getIdx();
+        feedRepository.deleteByAccountIdx(accountIdx);
         accountRepository.deleteById(TESTER_ID);
     }
 
@@ -57,8 +62,8 @@ public class FeedControllerTest {
         String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, accessToken))
-
+                        .header(HttpHeaders.AUTHORIZATION, accessToken)
+                        .param("content", "asd"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

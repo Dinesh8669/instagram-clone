@@ -21,6 +21,7 @@ public enum ExceptionEnum {
     UNSUPPORTED_IMAGE_FORMAT("011", "Unsupported Image Format(.jpg, .png)", HttpStatus.NOT_ACCEPTABLE),
 
     CANNOT_FOLLOW_YOURSELF("012", "Cannot Follow Yourself", HttpStatus.BAD_REQUEST),
+    FILE_OR_CONTENT_IS_MANDATORY("013", "The File or Content is Mandatory", HttpStatus.BAD_REQUEST),
 
     // Request Validation
     INVALID_REQUEST_BODY("100", "Invalid Request Body",HttpStatus.BAD_REQUEST),
