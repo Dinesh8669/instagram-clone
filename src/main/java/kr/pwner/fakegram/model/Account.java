@@ -53,7 +53,7 @@ public class Account {
 
     private String profileImage;
     // * Relation Mapping
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", fetch= FetchType.EAGER)
     private List<Feed> feeds = new ArrayList<>();
 
     // * Methods
