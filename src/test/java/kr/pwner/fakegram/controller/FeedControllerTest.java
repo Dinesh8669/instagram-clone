@@ -1,6 +1,7 @@
 package kr.pwner.fakegram.controller;
 
 import kr.pwner.fakegram.dto.account.CreateAccountDto;
+import kr.pwner.fakegram.model.Feed;
 import kr.pwner.fakegram.repository.AccountRepository;
 import kr.pwner.fakegram.repository.FeedRepository;
 import kr.pwner.fakegram.service.AccountService;
@@ -15,6 +16,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,11 +64,14 @@ public class FeedControllerTest {
     @Test
     public void CreateFeed() throws Exception {
         String accessToken = jwtService.GenerateAccessToken(TESTER_ID);
+        String content = "abcdefg";
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, accessToken)
-                        .param("content", "asd"))
+                        .param("content", content))
                 .andExpect(status().isOk())
                 .andDo(print());
+        List<Feed> feeds = accountRepository.findById(TESTER_ID).getFeeds(); //WOW!
+        assertEquals(content, feeds.get(0).getContent());
     }
 }

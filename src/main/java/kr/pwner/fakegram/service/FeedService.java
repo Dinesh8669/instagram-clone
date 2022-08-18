@@ -40,9 +40,9 @@ public class FeedService {
 
         Long accountIdx = decodedJWT.getClaim("idx").asLong();
         Account account = accountRepository.findByIdxAndIsActivateTrue(accountIdx);
-        Feed feed = Feed.builder().content("testing").build();
+        Feed feed = Feed.builder().content(content).build();
         feed.LinkAccount(account);
         feedRepository.save(feed);
 
-    } // https://stackoverflow.com/questions/49845355/spring-boot-controller-upload-multipart-and-json-to-dto
+    }
 }
