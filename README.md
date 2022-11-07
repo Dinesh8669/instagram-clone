@@ -2,6 +2,24 @@
 
 # Fakegram
 
+# Getting started
+## Prerequisites
+* Git
+* Docker
+* docker-compose
+##  Usage
+0. Clone this repository
+1. setup the .env file on project root directory
+   ```
+    # Example
+    JWT_ACCESS_SECRET=ed5ef268290148a8c3e172a64aecb0f7226616e34679eb833d28c37e49aa4b88
+    JWT_REFRESH_SECRET=d155c5b5fcd58362a046e5c65f0714ef897c9aca49116ec64ea9c746d2995e14
+    DATABASE_USER=databaseUser
+    DATABASE_PASS=databasePass
+   ```
+2. Run the database with `$ docker-compose up`
+3. Run the spring boot with `$ gradle bootrun`
+
 # Features
 
 - [x] Account CRUD - Look up the account, Sign-up, Update the account, Delete the account
